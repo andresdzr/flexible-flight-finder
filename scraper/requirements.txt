@@ -1,2 +1,6 @@
 amadeus
 pandas
+google-flights-analysis
+selenium
+tqdm
+numpy
