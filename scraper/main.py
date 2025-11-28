@@ -5,16 +5,19 @@ from amadeus import Client, ResponseError
 from datetime import timedelta, date
 
 # --- CONFIGURATION ---
-TEST_MODE = True  # Set to False to run the full 20-city, 6-month scrape
+TEST_MODE = False  # Set to False to run the full 20-city, 6-month scrape
 OUTPUT_FILE = "european_flight_network_data.csv"
 
 # Top 20 European Capitals (plus London/major hubs)
 # Using City Codes (e.g., PAR includes CDG and ORY)
+# ALL_CITIES = [
+#     "MAD", "LON", "PAR", "AMS", "ROM", 
+#     "VIE", "LIS", "BER", "DUB", "BRU",
+#     "ATH", "CPH", "OSL", "STO", "WAW",
+#     "BUD", "PRG", "HEL", "ZAG", "BUH"
+# ]
 ALL_CITIES = [
-    "MAD", "LON", "PAR", "AMS", "ROM", 
-    "VIE", "LIS", "BER", "DUB", "BRU",
-    "ATH", "CPH", "OSL", "STO", "WAW",
-    "BUD", "PRG", "HEL", "ZAG", "BUH"
+    "MAD", "LON", "PAR", "AMS", "ROM", "LIS"
 ]
 
 # Initialize Amadeus Client
@@ -23,7 +26,7 @@ amadeus = Client(
     client_secret='6UhfJYvKEbRgewPd'
 )
 
-def get_monthly_date_ranges(start_date, months=6):
+def get_monthly_date_ranges(start_date, months=2):
     """Generates (start, end) strings for 30-day chunks."""
     ranges = []
     current_start = start_date + timedelta(days=1)
@@ -46,7 +49,7 @@ def collect_market_data():
     else:
         print("🚀 FULL MODE ACTIVE: Running for all 20 cities and 6 months.")
         cities_to_scrape = ALL_CITIES
-        months_to_scrape = 6
+        months_to_scrape = 2
 
     # Generate date ranges
     today = date.today()
