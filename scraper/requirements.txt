@@ -4,3 +4,4 @@ selenium
 tqdm
 numpy
 selenium-stealth
+geopy
