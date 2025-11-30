@@ -1,4 +1,4 @@
-# European Flight Explorer
+# Flexible Flight Finder
 
 A full-stack web application for exploring and analyzing European flight data with interactive map visualization.
 
