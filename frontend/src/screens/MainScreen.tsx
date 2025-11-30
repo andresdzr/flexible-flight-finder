@@ -20,7 +20,7 @@ export default function MainScreen() {
           <div>
             <Breadcrumb items={[{ label: "Home" }]} className="mb-3" />
             <h1 className="text-5xl font-bold text-gray-900 dark:text-white mb-3">
-              European Flight Explorer
+              Flexible Flight Finder
             </h1>
             <p className="text-xl text-gray-600 dark:text-gray-400">
               Discover the best flight deals across Europe with interactive maps

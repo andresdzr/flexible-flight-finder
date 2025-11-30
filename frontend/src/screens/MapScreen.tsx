@@ -13,7 +13,7 @@ export function MapScreen() {
           <div>
             <Breadcrumb items={[{ label: "Map Explorer" }]} className="mb-3" />
             <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-2">
-              European Flight Explorer
+              Flexible Flight Finder
             </h1>
             <p className="text-gray-600 dark:text-gray-400">
               Click on cities to explore routes • Click on routes to view
