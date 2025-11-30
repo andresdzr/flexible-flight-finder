@@ -1,11 +1,20 @@
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import { MapScreen } from "@/screens/MapScreen";
+import MainScreen from "@/screens/MainScreen";
+import StatsScreen from "@/screens/StatsScreen";
 import "./App.css";
 
 function App() {
   return (
     <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-      <MapScreen />
+      <BrowserRouter>
+        <Routes>
+          <Route path="/" element={<MainScreen />} />
+          <Route path="/map" element={<MapScreen />} />
+          <Route path="/stats" element={<StatsScreen />} />
+        </Routes>
+      </BrowserRouter>
     </ThemeProvider>
   );
 }

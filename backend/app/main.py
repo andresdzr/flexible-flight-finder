@@ -10,6 +10,7 @@ from app.config import settings
 from app.data_loader import DataLoader
 from app import data_loader as data_loader_module
 from app.routes import router
+from app.statistics import router as statistics_router
 
 
 @asynccontextmanager
@@ -64,6 +65,7 @@ app.add_middleware(
 
 # Include routes
 app.include_router(router)
+app.include_router(statistics_router)
 
 
 @app.get("/")
@@ -75,6 +77,7 @@ async def root():
         "endpoints": {
             "cities_pricing": "/api/cities/pricing",
             "city_flights": "/api/cities/{city_name}/flights",
+            "statistics": "/api/statistics",
             "docs": "/docs",
             "openapi": "/openapi.json",
         },

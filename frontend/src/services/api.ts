@@ -3,6 +3,7 @@ import type {
   CityPricingResponse,
   CityFlightsResponse,
   CheapestFlightsPerRouteResponse,
+  StatisticsResponse,
 } from "@/types/api";
 
 const API_BASE_URL =
@@ -37,5 +38,20 @@ export const fetchCheapestFlightsPerRoute = async (
       params: { origin, destination },
     }
   );
+  return data;
+};
+
+export const fetchStatistics = async (
+  startDate?: string,
+  endDate?: string,
+  refresh?: boolean
+): Promise<StatisticsResponse> => {
+  const { data } = await api.get<StatisticsResponse>("/api/statistics", {
+    params: {
+      start_date: startDate,
+      end_date: endDate,
+      refresh: refresh || undefined,
+    },
+  });
   return data;
 };
