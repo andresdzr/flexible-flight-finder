@@ -32,6 +32,7 @@ class CityPricing(BaseModel):
 class FlightRoute(BaseModel):
     """Price information for flights to a specific destination."""
 
+    origin: City = Field(..., description="Origin city")
     destination: City = Field(..., description="Destination city")
     avg_price: float = Field(..., description="Average price for this route")
     median_price: float = Field(..., description="Median price for this route")

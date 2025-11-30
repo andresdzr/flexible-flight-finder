@@ -3,41 +3,52 @@ import type { FlightRoute } from "@/types/api";
 
 /**
  * Get HSL color for a price based on a gradient from green (low) to red (high)
+ * Theme-aware: adjusts lightness for dark mode
  * @param price Current price
  * @param minPrice Minimum price in the dataset
  * @param maxPrice Maximum price in the dataset
+ * @param isDark Whether dark mode is active
  * @returns HSL color string
  */
 export const getPriceColor = (
   price: number,
   minPrice: number,
-  maxPrice: number
+  maxPrice: number,
+  isDark = false
 ): string => {
   // Normalize price between 0 and 1
   const normalized =
     maxPrice > minPrice ? (price - minPrice) / (maxPrice - minPrice) : 0;
 
-  // Map to hue: 120 (green) -> 0 (red)
-  const hue = 120 - normalized * 120;
+  // Map to hue: 142 (green/success) -> 0 (red/destructive)
+  const hue = 142 - normalized * 142;
 
-  return `hsl(${hue}, 80%, 50%)`;
+  // Adjust saturation and lightness for theme
+  const saturation = isDark ? 70 : 80;
+  const lightness = isDark ? 55 : 50;
+
+  return `hsl(${hue}, ${saturation}%, ${lightness}%)`;
 };
 
 /**
  * Get marker color based on price_range category
+ * Theme-aware: uses CSS variables from theme
+ * @param priceRange Price range category
+ * @param isDark Whether dark mode is active
+ * @returns HSL color string using CSS variables
  */
 export const getMarkerColor = (priceRange: string): string => {
   switch (priceRange) {
     case "budget":
-      return "#22c55e"; // green-500
+      return "var(--success)";
     case "moderate":
-      return "#eab308"; // yellow-500
+      return "hsl(from var(--success) h s calc(l - 20))"; // darker success
     case "expensive":
-      return "#f97316"; // orange-500
+      return "var(--warning)";
     case "premium":
-      return "#ef4444"; // red-500
+      return "var(--destructive)";
     default:
-      return "#6b7280"; // gray-500
+      return "var(--muted-foreground)";
   }
 };
 
@@ -45,9 +56,9 @@ export const getMarkerColor = (priceRange: string): string => {
  * Calculate route line thickness based on flight count
  */
 export const getRouteThickness = (
-  flightCount: number,
-  minCount: number,
-  maxCount: number
+  _flightCount: number,
+  _minCount: number,
+  _maxCount: number
 ): number => {
   // const minThickness = 2;
   // const maxThickness = 8;
@@ -91,4 +102,8 @@ export const getRouteFlightCountRange = (
 
 export const getRouteOpacity = (isSelected: boolean): number => {
   return isSelected ? 0.7 : 0.2;
+};
+
+export const getCityOpacity = (isSelected: boolean): number => {
+  return isSelected ? 1.0 : 0.3;
 };

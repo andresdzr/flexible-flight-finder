@@ -23,6 +23,7 @@ export interface CityPricingResponse {
 }
 
 export interface FlightRoute {
+  origin: City;
   destination: City;
   avg_price: number;
   median_price: number;

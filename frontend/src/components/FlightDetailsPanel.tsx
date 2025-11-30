@@ -5,18 +5,12 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { fetchCheapestFlightsPerRoute } from "@/services/api";
 import { toast } from "sonner";
 import type { FlightDetail } from "@/types/api";
+import { useMap } from "@/contexts";
 
-interface FlightDetailsPanelProps {
-  origin: string | null;
-  destination: string | null;
-  onClose: () => void;
-}
-
-export function FlightDetailsPanel({
-  origin,
-  destination,
-  onClose,
-}: FlightDetailsPanelProps) {
+export function FlightDetailsPanel() {
+  const { selectedRoute, clearSelection } = useMap();
+  const origin = selectedRoute?.origin || null;
+  const destination = selectedRoute?.destination || null;
   const isOpen = origin && destination;
 
   const {
@@ -25,8 +19,9 @@ export function FlightDetailsPanel({
     error,
   } = useQuery({
     queryKey: ["route-flights", origin, destination],
-    queryFn: () => fetchCheapestFlightsPerRoute(origin!, destination!),
-    enabled: !!isOpen,
+    queryFn: () =>
+      fetchCheapestFlightsPerRoute(origin!.name, destination!.name),
+    enabled: !!isOpen && !!origin && !!destination,
   });
 
   if (error) {
@@ -45,11 +40,11 @@ export function FlightDetailsPanel({
     <Card className="fixed top-4 right-4 w-96 max-h-[calc(100vh-2rem)] overflow-hidden z-1000 shadow-2xl">
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3 border-b">
         <CardTitle className="text-lg">
-          {origin} → {destination}
+          {origin.name} → {destination.name}
         </CardTitle>
         <button
-          onClick={onClose}
-          className="rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none"
+          onClick={clearSelection}
+          className="rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none cursor-pointer"
         >
           <X className="h-4 w-4" />
           <span className="sr-only">Close</span>

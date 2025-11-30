@@ -8,7 +8,8 @@ import {
   useMapEvents,
 } from "react-leaflet";
 import { useQuery } from "@tanstack/react-query";
-import type { LatLngExpression } from "leaflet";
+import { useTheme } from "next-themes";
+import { DomEvent, type LatLngExpression } from "leaflet";
 import { fetchCitiesPricing, fetchCityFlights } from "@/services/api";
 import { Skeleton } from "@/components/ui/skeleton";
 import { toast } from "sonner";
@@ -20,7 +21,9 @@ import {
   getRoutePriceRange,
   getRouteFlightCountRange,
   getRouteOpacity,
+  getCityOpacity,
 } from "@/lib/mapUtils";
+import { useMap } from "@/contexts";
 import "leaflet/dist/leaflet.css";
 
 // Europe center coordinates
@@ -30,28 +33,31 @@ const EUROPE_ZOOM = 4;
 // Base sizes at default zoom
 const BASE_MARKER_RADIUS = 8;
 
-interface FlightMapProps {
-  onRouteSelect: (origin: string, destination: string) => void;
-}
-
 // Component to handle zoom events
 function ZoomHandler({
   onZoomChange,
+  onMapClick,
 }: {
   onZoomChange: (zoom: number) => void;
+  onMapClick: () => void;
 }) {
   const map = useMapEvents({
     zoomend: () => {
       onZoomChange(map.getZoom());
     },
+    click: () => {
+      onMapClick();
+    },
   });
   return null;
 }
 
-export function FlightMap({ onRouteSelect }: FlightMapProps) {
+export function FlightMap() {
+  const { theme } = useTheme();
+  const isDark = theme === "dark";
+  const { setSelectedRoute, selectedRoute } = useMap();
   const [selectedCity, setSelectedCity] = useState<string | null>(null);
   const [zoomLevel, setZoomLevel] = useState(EUROPE_ZOOM);
-  const [selectedRoute, setSelectedRoute] = useState<FlightRoute | null>(null);
 
   const {
     data: citiesData,
@@ -87,15 +93,19 @@ export function FlightMap({ onRouteSelect }: FlightMapProps) {
   }
 
   const handleCityClick = (cityName: string) => {
+    console.log("City clicked:", cityName);
     setSelectedCity(cityName);
     setSelectedRoute(null);
-    onRouteSelect(cityName, "");
   };
 
   const handleRouteClick = (route: FlightRoute) => {
     setSelectedRoute(route);
-    if (routesData?.origin_city) {
-      onRouteSelect(routesData.origin_city.name, route.destination.name);
+  };
+
+  const handleMapClick = () => {
+    if (!selectedRoute) {
+      console.log("Map clicked, clearing selected city");
+      setSelectedCity(null);
     }
   };
 
@@ -123,11 +133,16 @@ export function FlightMap({ onRouteSelect }: FlightMapProps) {
         zoomControl={true}
       >
         <TileLayer
+          key={isDark ? "dark" : "light"}
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
-          url="https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png"
+          url={
+            isDark
+              ? "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
+              : "https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png"
+          }
         />
 
-        <ZoomHandler onZoomChange={setZoomLevel} />
+        <ZoomHandler onZoomChange={setZoomLevel} onMapClick={handleMapClick} />
 
         {/* Route Lines */}
         {routesLoading && selectedCity && (
@@ -152,7 +167,8 @@ export function FlightMap({ onRouteSelect }: FlightMapProps) {
           const color = getPriceColor(
             route.median_price,
             priceRange.min,
-            priceRange.max
+            priceRange.max,
+            isDark
           );
           const baseWeight = getRouteThickness(
             route.flight_count,
@@ -170,14 +186,18 @@ export function FlightMap({ onRouteSelect }: FlightMapProps) {
             <Polyline
               key={`${routesData!.origin_city.name}-${
                 route.destination.name
-              }-${zoomLevel}-${opacity}`}
+              }-${zoomLevel}-${opacity}-${isDark}`}
               positions={[originCoords, destCoords]}
               color={color}
               weight={weight}
               opacity={opacity}
               eventHandlers={{
-                click: () => handleRouteClick(route),
+                click: (e) => {
+                  DomEvent.stopPropagation(e);
+                  handleRouteClick(route);
+                },
               }}
+              pane="overlayPane"
             >
               <Tooltip>
                 <div className="text-sm">
@@ -194,29 +214,41 @@ export function FlightMap({ onRouteSelect }: FlightMapProps) {
         })}
 
         {/* City Markers */}
-        {citiesData?.cities.map((city: CityPricing) => (
-          <CircleMarker
-            key={`${city.city.name}-${zoomLevel}`}
-            center={[city.city.coords.lat, city.city.coords.lon]}
-            radius={markerRadius}
-            fillColor={getMarkerColor(city.price_range)}
-            color="#fff"
-            weight={2}
-            opacity={1}
-            fillOpacity={0.8}
-            eventHandlers={{
-              click: () => handleCityClick(city.city.name),
-            }}
-          >
-            <Tooltip>
-              <div className="text-sm">
-                <strong>{city.city.name}</strong>
-                <div>Median: €{city.median_price}</div>
-                <div>Cheapest: €{city.min_price}</div>
-              </div>
-            </Tooltip>
-          </CircleMarker>
-        ))}
+        {citiesData?.cities.map((city: CityPricing) => {
+          const opacity = selectedCity
+            ? getCityOpacity(
+                selectedCity === city.city.name ||
+                  selectedRoute?.destination.name === city.city.name
+              )
+            : 0.8;
+          return (
+            <CircleMarker
+              key={`${city.city.name}-${zoomLevel}-${opacity}`}
+              center={[city.city.coords.lat, city.city.coords.lon]}
+              radius={markerRadius}
+              fillColor={getMarkerColor(city.price_range)}
+              color={isDark ? "#fff" : "#888"}
+              weight={2}
+              opacity={1.0}
+              fillOpacity={opacity}
+              eventHandlers={{
+                click: (e) => {
+                  DomEvent.stopPropagation(e);
+                  handleCityClick(city.city.name);
+                },
+              }}
+              pane="markerPane"
+            >
+              <Tooltip>
+                <div className="text-sm">
+                  <strong>{city.city.name}</strong>
+                  <div>Median: €{city.median_price}</div>
+                  <div>Cheapest: €{city.min_price}</div>
+                </div>
+              </Tooltip>
+            </CircleMarker>
+          );
+        })}
       </MapContainer>
     </div>
   );

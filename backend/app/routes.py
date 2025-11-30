@@ -143,6 +143,7 @@ async def get_city_flights(city_name: str):
                 continue
 
             route = FlightRoute(
+                origin=origin_city,
                 destination=dest_city,
                 avg_price=round(avg_price, 2),
                 median_price=round(median_price, 2),
