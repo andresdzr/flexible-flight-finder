@@ -7,40 +7,52 @@ from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium_stealth import stealth
+import argparse
 
 # --- CONFIGURATION ---
-OUTPUT_FILE = "google_calendar_prices.csv"
 MONTHS_TO_SCRAPE = 12
 
 # Top 25 Cities (Names must match what Google Flights Autocomplete expects/shows)
-CITIES = [
-    "Madrid",
-    "London",
-    "Paris",
-    "Amsterdam",
-    "Rome",
-    "Berlin",
-    "Vienna",
-    "Lisbon",
-    "Dublin",
-    "Brussels",
-    "Athens",
-    "Prague",
-    "Budapest",
-    "Warsaw",
-    "Copenhagen",
-    "Stockholm",
-    "Oslo",
-    "Helsinki",
-    "Bucharest",
-    "Sofia",
-    "Riga",
-    "Vilnius",
-    "Tallinn",
-    "Ljubljana",
-    "Bratislava",
-]
+# CITIES = [
+#     "Madrid",
+#     "London",
+#     "Paris",
+#     "Amsterdam",
+#     "Rome",
+#     "Berlin",
+#     "Vienna",
+#     "Lisbon",
+#     "Dublin",
+#     "Brussels",
+#     "Athens",
+#     "Prague",
+#     "Budapest",
+#     "Warsaw",
+#     "Copenhagen",
+#     "Stockholm",
+#     "Oslo",
+#     "Helsinki",
+#     "Bucharest",
+#     "Sofia",
+#     "Riga",
+#     "Vilnius",
+#     "Tallinn",
+#     "Ljubljana",
+#     "Bratislava",
+# ]
 
+CITIES = [
+    "Barcelona", # South
+    "Frankfurt", # Central
+    "Milan", # South
+    "Istanbul", # East
+    "Krakow", # East
+    "Zurich", # Central
+    "Manchester", # West
+    "Nice", # West
+    "Copenhagen", # North
+    "Oslo", # North
+]
 
 def setup_driver():
     options = webdriver.ChromeOptions()
@@ -70,7 +82,7 @@ def setup_driver():
     return driver
 
 
-def scrape_route(driver, origin, destination):
+def scrape_route(driver, origin, destination, output_file):
     print(f"\n✈️  Processing Route: {origin} -> {destination}")
     prices_map = {}
 
@@ -179,8 +191,8 @@ def scrape_route(driver, origin, destination):
             df = df.sort_values(by="Date")
 
             # Check if file exists to determine if we need a header
-            file_exists = os.path.isfile(OUTPUT_FILE)
-            df.to_csv(OUTPUT_FILE, mode="a", header=not file_exists, index=False)
+            file_exists = os.path.isfile(output_file)
+            df.to_csv(output_file, mode="a", header=not file_exists, index=False)
             print(f"   ✅ Saved {len(df)} prices for {origin}->{destination}")
         else:
             print(f"   ⚠️ No data found for {origin}->{destination}")
@@ -189,7 +201,7 @@ def scrape_route(driver, origin, destination):
         print(f"   ❌ Critical Error on route: {e}")
 
 
-def run_network_scrape():
+def main(output_file):
     driver = setup_driver()
 
     try:
@@ -217,4 +229,9 @@ def run_network_scrape():
 
 
 if __name__ == "__main__":
-    run_network_scrape()
+    parser = argparse.ArgumentParser(description="Scrapes Google Flights for flight prices between specified cities.")
+    parser.add_argument("months", help="Months to scrape", type=str)
+    parser.add_argument("output", help="The path where the enriched CSV file should be saved", type=str)
+    args = parser.parse_args()
+    
+    main(args.output)
