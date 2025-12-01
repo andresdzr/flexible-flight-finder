@@ -1,5 +1,5 @@
 import pandas as pd
-import time
+import datetime
 from geopy.distance import geodesic
 
 # --- CONFIGURATION ---
@@ -32,6 +32,7 @@ CITY_COORDINATES = {
     "Ljubljana": (46.0569, 14.5058),
     "Bratislava": (48.1486, 17.1077)
 }
+SCRAPE_DATE = datetime.datetime(2025, 11, 30)
 
 def enrich_data():
     print(f"📂 Loading {INPUT_FILE}...")
@@ -53,7 +54,7 @@ def enrich_data():
     if initial_len != len(df):
         print(f"   Dropped {initial_len - len(df)} rows with invalid prices.")
         
-    df = df.rename(columns={"Price": "Price in €"})
+    df = df.rename(columns={"Price": "Price_in_€"})
 
     # 2. Static Geocoding
     city_coords = CITY_COORDINATES
@@ -89,12 +90,13 @@ def enrich_data():
     df['Month'] = df['Date'].dt.month
     df['Day'] = df['Date'].dt.day
     df['Weekday'] = df['Date'].dt.day_name() # e.g., "Monday", "Tuesday"
+    df['Days_until_departure'] = df['Days_until_departure'] = (df['Date'] - SCRAPE_DATE).dt.days
 
     # 5. Save Final Dataset
     df.to_csv(OUTPUT_FILE, index=False)
     print(f"🎉 Success! Enriched data saved to {OUTPUT_FILE}")
     print("\nSample Data:")
-    print(df[['Origin', 'Destination', 'Price in €', 'Distance_km', 'Weekday', 'Month']].head())
+    print(df.head())
 
 if __name__ == "__main__":
     enrich_data()

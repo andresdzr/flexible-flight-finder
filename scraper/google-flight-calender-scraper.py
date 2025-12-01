@@ -12,7 +12,7 @@ from selenium_stealth import stealth
 
 # --- CONFIGURATION ---
 OUTPUT_FILE = "google_calendar_prices.csv"
-MONTHS_TO_SCRAPE = 6
+MONTHS_TO_SCRAPE = 12
 
 # Top 25 Cities (Names must match what Google Flights Autocomplete expects/shows)
 CITIES = [

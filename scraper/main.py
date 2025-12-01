@@ -49,7 +49,7 @@ def collect_market_data():
     else:
         print("🚀 FULL MODE ACTIVE: Running for all 20 cities and 6 months.")
         cities_to_scrape = ALL_CITIES
-        months_to_scrape = 2
+        months_to_scrape = 12
 
     # Generate date ranges
     today = date.today()
