@@ -143,5 +143,4 @@ We store clustering results in a dictionary:
 - Budget hubs  
 - KMeans hybrid clusters  
 
-Everything is cleaned and saved as:
 
