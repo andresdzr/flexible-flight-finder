@@ -35,7 +35,7 @@ async def get_cities_pricing():
         city_data = []
         for dest_city in destinations:
             flights_to_city = df.filter(pl.col("Destination") == dest_city)
-            prices = flights_to_city["Price in €"].to_list()
+            prices = flights_to_city["Price_in_EUR"].to_list()
 
             if not prices:
                 continue
@@ -128,7 +128,7 @@ async def get_city_flights(city_name: str):
             flights_to_dest = flights_from_city.filter(
                 pl.col("Destination") == dest_city_name
             )
-            prices = flights_to_dest["Price in €"].to_list()
+            prices = flights_to_dest["Price_in_EUR"].to_list()
 
             if not prices:
                 continue
@@ -157,7 +157,7 @@ async def get_city_flights(city_name: str):
         routes.sort(key=lambda x: x.avg_price)
 
         # Get top 5 cheapest individual flights
-        cheapest_flights_df = flights_from_city.sort("Price in €").head(5)
+        cheapest_flights_df = flights_from_city.sort("Price_in_EUR").head(5)
 
         cheapest_flights = []
         for row in cheapest_flights_df.iter_rows(named=True):
@@ -169,7 +169,7 @@ async def get_city_flights(city_name: str):
                 origin=origin_city,
                 destination=dest_city,
                 date=str(row["Date"]),
-                price=float(row["Price in €"]),
+                price=float(row["Price_in_EUR"]),
                 distance_km=int(row["Distance_km"]),
                 weekday=row["Weekday"],
                 year=int(row["Year"]),
@@ -237,7 +237,7 @@ async def get_cheapest_flights_per_route(origin: str, destination: str):
         total_flights = len(route_flights)
 
         # Get top 10 cheapest flights
-        cheapest_flights_df = route_flights.sort("Price in €").head(10)
+        cheapest_flights_df = route_flights.sort("Price_in_EUR").head(10)
 
         cheapest_flights = []
         for row in cheapest_flights_df.iter_rows(named=True):
@@ -245,7 +245,7 @@ async def get_cheapest_flights_per_route(origin: str, destination: str):
                 origin=origin_city,
                 destination=dest_city,
                 date=str(row["Date"]),
-                price=float(row["Price in €"]),
+                price=float(row["Price_in_EUR"]),
                 distance_km=int(row["Distance_km"]),
                 weekday=row["Weekday"],
                 year=int(row["Year"]),

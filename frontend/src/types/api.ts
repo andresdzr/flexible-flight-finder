@@ -5,6 +5,7 @@ export interface Coordinates {
 
 export interface City {
   name: string;
+  country_code?: string;
   coords: Coordinates;
 }
 
@@ -42,6 +43,12 @@ export interface FlightDetail {
   year: number;
   month: number;
   day: number;
+  return_date?: string;
+}
+
+export interface FlightSearchResponse {
+  flights: FlightDetail[];
+  count: number;
 }
 
 export interface CityFlightsResponse {
