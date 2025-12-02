@@ -9,49 +9,43 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium_stealth import stealth
 import argparse
 
-# --- CONFIGURATION ---
-MONTHS_TO_SCRAPE = 12
-
 # Top 25 Cities (Names must match what Google Flights Autocomplete expects/shows)
-# CITIES = [
-#     "Madrid",
-#     "London",
-#     "Paris",
-#     "Amsterdam",
-#     "Rome",
-#     "Berlin",
-#     "Vienna",
-#     "Lisbon",
-#     "Dublin",
-#     "Brussels",
-#     "Athens",
-#     "Prague",
-#     "Budapest",
-#     "Warsaw",
-#     "Copenhagen",
-#     "Stockholm",
-#     "Oslo",
-#     "Helsinki",
-#     "Bucharest",
-#     "Sofia",
-#     "Riga",
-#     "Vilnius",
-#     "Tallinn",
-#     "Ljubljana",
-#     "Bratislava",
-# ]
-
 CITIES = [
-    "Barcelona", # South
-    "Frankfurt", # Central
-    "Milan", # South
-    "Istanbul", # East
-    "Krakow", # East
-    "Zurich", # Central
-    "Manchester", # West
-    "Nice", # West
-    "Copenhagen", # North
-    "Oslo", # North
+    "Madrid",
+    "London",
+    "Paris",
+    "Amsterdam",
+    "Rome",
+    "Berlin",
+    "Vienna",
+    "Lisbon",
+    "Dublin",
+    "Brussels",
+    "Athens",
+    "Prague",
+    "Budapest",
+    "Warsaw",
+    "Copenhagen",
+    "Stockholm",
+    "Oslo",
+    "Helsinki",
+    "Bucharest",
+    "Sofia",
+    "Riga",
+    "Vilnius",
+    "Tallinn",
+    "Ljubljana",
+    "Bratislava",
+    "Barcelona", 
+    "Frankfurt", 
+    "Milan", 
+    "Istanbul",
+    "Krakow", 
+    "Zurich", 
+    "Manchester",
+    "Nice", 
+    "Copenhagen", 
+    "Oslo", 
 ]
 
 def setup_driver():
@@ -82,7 +76,7 @@ def setup_driver():
     return driver
 
 
-def scrape_route(driver, origin, destination, output_file):
+def scrape_route(driver, origin, destination, months, output_file):
     print(f"\n✈️  Processing Route: {origin} -> {destination}")
     prices_map = {}
 
@@ -123,7 +117,7 @@ def scrape_route(driver, origin, destination, output_file):
             return
 
         # 4. Scrape X Months
-        for i in range(MONTHS_TO_SCRAPE):
+        for i in range(months):
             # Find visible grid cells
             day_cells = driver.find_elements(By.CSS_SELECTOR, "div[role='gridcell']")
 
@@ -170,7 +164,7 @@ def scrape_route(driver, origin, destination, output_file):
                     continue
 
             # Click Next
-            if i < MONTHS_TO_SCRAPE - 1:
+            if i < months - 1:
                 try:
                     next_button = driver.find_element(
                         By.XPATH, "//button[contains(@aria-label, 'Next')]"
@@ -201,7 +195,7 @@ def scrape_route(driver, origin, destination, output_file):
         print(f"   ❌ Critical Error on route: {e}")
 
 
-def main(output_file):
+def main(months,output_file):
     driver = setup_driver()
 
     try:
@@ -216,7 +210,7 @@ def main(output_file):
 
                 count += 1
                 print(f"--- Progress: {count}/{total_routes} ---")
-                scrape_route(driver, origin, destination)
+                scrape_route(driver, origin, destination, months, output_file)
 
                 # Small pause between routes to be polite :-)
                 time.sleep(2)
@@ -234,4 +228,4 @@ if __name__ == "__main__":
     parser.add_argument("output", help="The path where the enriched CSV file should be saved", type=str)
     args = parser.parse_args()
     
-    main(args.output)
+    main(args.months, args.output)
