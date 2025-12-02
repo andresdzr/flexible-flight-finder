@@ -9,7 +9,6 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium_stealth import stealth
 import argparse
 
-# Top 25 Cities (Names must match what Google Flights Autocomplete expects/shows)
 CITIES = [
     "Madrid",
     "London",
