@@ -2,6 +2,7 @@ from pydantic import BaseModel, Field
 from typing import Optional
 from app.schemas import FlightDetail
 
+
 class FlightSearchRequest(BaseModel):
     min_days: Optional[int] = Field(None, description="Minimum trip duration in days")
     max_days: Optional[int] = Field(None, description="Maximum trip duration in days")
@@ -11,6 +12,16 @@ class FlightSearchRequest(BaseModel):
     non_stop: Optional[bool] = Field(False, description="Only non-stop flights")
     one_way: Optional[bool] = Field(False, description="One way only")
 
+
+class TripOption(BaseModel):
+    outbound_flight: FlightDetail = Field(..., description="Outbound flight")
+    return_flight: Optional[FlightDetail] = Field(
+        None, description="Return flight (None for one-way)"
+    )
+    total_price: float = Field(..., description="Total price for the trip")
+    trip_duration_days: int = Field(..., description="Duration of the trip in days")
+
+
 class FlightSearchResponse(BaseModel):
-    flights: list[FlightDetail] = Field(..., description="List of found flights")
-    count: int = Field(..., description="Number of flights found")
+    trips: list[TripOption] = Field(..., description="List of trip options")
+    count: int = Field(..., description="Number of trip options found")

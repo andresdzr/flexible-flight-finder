@@ -107,14 +107,21 @@ class DataLoader:
                 "Origin": pl.Utf8,
                 "Destination": pl.Utf8,
                 "Date": pl.Date,
-                "Price in €": pl.Float64,
+                "Price_in_€": pl.Int64,
                 "Distance_km": pl.Int64,
                 "Year": pl.Int64,
                 "Month": pl.Int64,
                 "Day": pl.Int64,
                 "Weekday": pl.Utf8,
+                "Days_until_departure": pl.Int64,
             },
         )
+
+        if "Price_in_€" in self.df.columns:
+            self.df = self.df.rename({"Price_in_€": "Price_in_EUR"})
+            print("Renamed 'Price_in_€' column to 'Price_in_EUR'")
+
+        print(self.df.head())
 
         print(f"Loaded {len(self.df)} flight records")
         print(f"Columns: {self.df.columns}")

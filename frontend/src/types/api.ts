@@ -126,3 +126,25 @@ export interface StatisticsResponse {
   price_distribution: PriceDistribution[];
   metadata: StatisticsMetadata;
 }
+
+export interface FlightSearchParams {
+  min_days?: number;
+  max_days?: number;
+  start_month?: string;
+  end_month?: string;
+  max_price?: number;
+  non_stop?: boolean;
+  one_way?: boolean;
+}
+
+export interface TripOption {
+  outbound_flight: FlightDetail;
+  return_flight?: FlightDetail;
+  total_price: number;
+  trip_duration_days: number;
+}
+
+export interface FlightSearchResponse {
+  trips: TripOption[];
+  count: number;
+}
