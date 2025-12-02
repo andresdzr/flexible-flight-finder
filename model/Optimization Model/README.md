@@ -39,10 +39,11 @@ The solution is obtained through **integer linear programming (MILP)** with Pyom
 
 The main function is:
 
-## 1. Input Parameters
-
 ```python
 out = optimizer.optimizer(start_date, end_date, budget, origin, ...)
+```
+
+## 1. Input Parameters
 
 | Parameter               | Type    | Description                                                                               |
 |-------------------------|---------|-------------------------------------------------------------------------------------------|
