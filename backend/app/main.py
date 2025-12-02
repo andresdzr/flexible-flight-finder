@@ -11,6 +11,7 @@ from app.data_loader import DataLoader
 from app import data_loader as data_loader_module
 from app.routes import router
 from app.statistics import router as statistics_router
+from app.search_routes import router as search_router
 
 
 @asynccontextmanager
@@ -66,6 +67,7 @@ app.add_middleware(
 # Include routes
 app.include_router(router)
 app.include_router(statistics_router)
+app.include_router(search_router)
 
 
 @app.get("/")

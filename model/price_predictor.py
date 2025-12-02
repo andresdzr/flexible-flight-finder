@@ -35,6 +35,8 @@ df_full = pd.concat(df_list, axis=0, ignore_index=True)
 
 print(f"Total Combined Shape: {df_full.shape}")
 
+df.to_csv("./data/european_flight_data_enriched.csv", index=False)
+
 # 2. FURTHER FEATURE ENGINEERING & PREPROCESSING
 def preprocess_data(df):
     """

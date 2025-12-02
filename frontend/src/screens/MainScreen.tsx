@@ -10,6 +10,7 @@ import {
   Calendar,
   PieChart,
 } from "lucide-react";
+import { FlightFinder } from "@/components/FlightFinder";
 
 export default function MainScreen() {
   return (
@@ -45,6 +46,9 @@ export default function MainScreen() {
             and discover the cheapest times to fly to your dream destination.
           </p>
         </div>
+
+        {/* Flight Finder */}
+        <FlightFinder />
 
         {/* Main Navigation Cards */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
