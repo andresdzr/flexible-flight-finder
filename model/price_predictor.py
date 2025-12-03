@@ -172,13 +172,3 @@ print(" - Model saved to 'flight_price_xgb_model.joblib'")
 model_columns = list(X_train.columns)
 joblib.dump(model_columns, "model_features.joblib")
 print(" - Model features list saved to 'model_features.joblib'")
-
-print("\n--- DEPLOYMENT GUIDE ---")
-print("To use this model in your website app:")
-print("1. Load model:   model = joblib.load('flight_price_xgb_model.joblib')")
-print("2. Load columns: model_columns = joblib.load('model_features.joblib')")
-print("3. Preprocess new user input (create DataFrame, get_dummies, etc).")
-print(
-    "4. Align columns: input_df = input_df.reindex(columns=model_columns, fill_value=0)"
-)
-print("5. Predict:      price = model.predict(input_df)")
