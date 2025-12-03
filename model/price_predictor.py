@@ -18,6 +18,11 @@ print("Loading data...")
 # Get a list of all CSV files in the data directory
 all_files = glob.glob(os.path.join(DATA_DIR, "*.csv"))
 
+# Exclude the output file from the input list to avoid recursive loading
+output_file = os.path.join(DATA_DIR, "european_flight_data_enriched.csv")
+if output_file in all_files:
+    all_files.remove(output_file)
+
 if not all_files:
     raise FileNotFoundError(f"No CSV files found in {DATA_DIR}")
 
@@ -27,6 +32,9 @@ print(f"Found {len(all_files)} files: {[os.path.basename(f) for f in all_files]}
 df_list = []
 for filename in all_files:
     df = pd.read_csv(filename)
+    # Standardize price column name
+    if "Price_in_€" in df.columns:
+        df.rename(columns={"Price_in_€": "Price_in_EUR"}, inplace=True)
     df_list.append(df)
 
 # Concatenate all dataframes
@@ -45,11 +53,11 @@ def preprocess_data(df):
     """
     # Filter out prices above the threshold to remove outliers
     # We do this BEFORE splitting X and y to ensure indices match
-    df_clean = df[df["Price_in_€"] <= PRICE_THRESHOLD].copy()
+    df_clean = df[df["Price_in_EUR"] <= PRICE_THRESHOLD].copy()
 
     # List all columns we want to remove from the feature set (X)
-    # We remove the target 'Price_in_€' and irrelevant/redundant cols
-    cols_to_drop = ["Price_in_€"]
+    # We remove the target 'Price_in_EUR' and irrelevant/redundant cols
+    cols_to_drop = ["Price_in_EUR"]
 
     potential_drops = [
         "Date",
@@ -67,7 +75,7 @@ def preprocess_data(df):
 
     # Separate Features and Target
     X = df_clean.drop(columns=cols_to_drop, errors="ignore")
-    y = df_clean["Price_in_€"]
+    y = df_clean["Price_in_EUR"]
 
     return X, y
 
