@@ -9,6 +9,8 @@ class Settings(BaseSettings):
     data_path: str = "../scraper/european_flight_data_enriched.csv"
     reload: bool = False
     geocode_cache_path: str = "geocode_cache.json"
+    amadeus_api_key: str = ""
+    amadeus_api_secret: str = ""
 
     model_config = SettingsConfigDict(
         env_file=".env", env_file_encoding="utf-8", case_sensitive=False

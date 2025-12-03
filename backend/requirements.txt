@@ -5,3 +5,9 @@ pydantic==2.9.2
 pydantic-settings==2.6.0
 requests==2.32.3
 python-dotenv==1.0.1
+httpx==0.25.2
+airportsdata==20241001
+pandas==2.2.3
+xgboost==2.1.3
+scikit-learn==1.5.2
+joblib==1.4.2

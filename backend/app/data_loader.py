@@ -107,7 +107,7 @@ class DataLoader:
                 "Origin": pl.Utf8,
                 "Destination": pl.Utf8,
                 "Date": pl.Date,
-                "Price in €": pl.Float64,
+                "Price_in_EUR": pl.Float64,
                 "Distance_km": pl.Int64,
                 "Year": pl.Int64,
                 "Month": pl.Int64,

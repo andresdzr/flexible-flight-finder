@@ -10,6 +10,7 @@ import {
   Calendar,
   PieChart,
 } from "lucide-react";
+import { FlightFinder } from "@/components/FlightFinder";
 
 export default function MainScreen() {
   return (
@@ -34,7 +35,7 @@ export default function MainScreen() {
         <div className="mb-12 text-center">
           <div className="inline-block bg-blue-100 dark:bg-blue-900 rounded-full px-6 py-2 mb-6">
             <span className="text-blue-800 dark:text-blue-200 font-semibold">
-              Analyzing 100,000+ flight routes
+              300,000+ flights analyzed
             </span>
           </div>
           <h2 className="text-3xl font-bold text-gray-800 dark:text-gray-200 mb-4">
@@ -45,6 +46,9 @@ export default function MainScreen() {
             and discover the cheapest times to fly to your dream destination.
           </p>
         </div>
+
+        {/* Flight Finder */}
+        <FlightFinder />
 
         {/* Main Navigation Cards */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">

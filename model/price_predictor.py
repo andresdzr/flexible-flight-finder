@@ -10,7 +10,7 @@ import os
 import joblib
 
 PRICE_THRESHOLD = 250
-DATA_DIR = './data'
+DATA_DIR = "./data"
 
 # 1. LOAD AND MERGE DATA
 print("Loading data...")
@@ -35,6 +35,9 @@ df_full = pd.concat(df_list, axis=0, ignore_index=True)
 
 print(f"Total Combined Shape: {df_full.shape}")
 
+df.to_csv("./data/european_flight_data_enriched.csv", index=False)
+
+
 # 2. FURTHER FEATURE ENGINEERING & PREPROCESSING
 def preprocess_data(df):
     """
@@ -42,26 +45,32 @@ def preprocess_data(df):
     """
     # Filter out prices above the threshold to remove outliers
     # We do this BEFORE splitting X and y to ensure indices match
-    df_clean = df[df['Price_in_€'] <= PRICE_THRESHOLD].copy()
-    
+    df_clean = df[df["Price_in_€"] <= PRICE_THRESHOLD].copy()
+
     # List all columns we want to remove from the feature set (X)
     # We remove the target 'Price_in_€' and irrelevant/redundant cols
-    cols_to_drop = ['Price_in_€']
-    
+    cols_to_drop = ["Price_in_€"]
+
     potential_drops = [
-        'Date', 'Origin', 'Destination', 
-        'Day', 'Year', 'Origin_Country', 'Destination_Country'
+        "Date",
+        "Origin",
+        "Destination",
+        "Day",
+        "Year",
+        "Origin_Country",
+        "Destination_Country",
     ]
-    
+
     for col in potential_drops:
         if col in df_clean.columns:
             cols_to_drop.append(col)
 
     # Separate Features and Target
-    X = df_clean.drop(columns=cols_to_drop, errors='ignore')
-    y = df_clean['Price_in_€']
-    
+    X = df_clean.drop(columns=cols_to_drop, errors="ignore")
+    y = df_clean["Price_in_€"]
+
     return X, y
+
 
 # Apply preprocessing to the full dataset
 X_raw, y = preprocess_data(df_full)
@@ -71,7 +80,7 @@ print(f"Shape after preprocessing: {X_raw.shape}")
 # 3. ENCODING & SPLITTING
 print("Encoding categorical variables...")
 
-categorical_cols = ['Weekday']
+categorical_cols = ["Weekday"]
 
 # One-Hot Encoding on the full dataset
 # This ensures that all categories present in the data are created as columns
@@ -84,10 +93,7 @@ print("Splitting data into Train and Test sets...")
 
 # Perform the random split (80% train, 20% test)
 X_train, X_test, y_train, y_test = train_test_split(
-    X_encoded, 
-    y, 
-    test_size=0.3, 
-    random_state=42
+    X_encoded, y, test_size=0.3, random_state=42
 )
 
 print(f"Training Set: {X_train.shape}")
@@ -100,19 +106,17 @@ print("Training XGBoost Model...")
 model = xgb.XGBRegressor(
     n_estimators=1000,
     learning_rate=0.1,
-    max_depth=7,            
-    subsample=0.75,          
-    colsample_bytree=0.75,   
+    max_depth=7,
+    subsample=0.75,
+    colsample_bytree=0.75,
     random_state=42,
-    n_jobs=-1,               
-    early_stopping_rounds=100, 
+    n_jobs=-1,
+    early_stopping_rounds=100,
 )
 
 # Fit the model
 model.fit(
-    X_train, y_train,
-    eval_set=[(X_train, y_train), (X_test, y_test)],
-    verbose=100
+    X_train, y_train, eval_set=[(X_train, y_train), (X_test, y_test)], verbose=100
 )
 
 # 5. EVALUATION
@@ -123,10 +127,10 @@ predictions = model.predict(X_test)
 mae = mean_absolute_error(y_test, predictions)
 rmse = np.sqrt(mean_squared_error(y_test, predictions))
 
-print("\n" + "="*30)
+print("\n" + "=" * 30)
 print(f"Mean Absolute Error (MAE): €{mae:.2f}")
 print(f"Root Mean Sq Error (RMSE): €{rmse:.2f}")
-print("="*30 + "\n")
+print("=" * 30 + "\n")
 
 print(f"On average, the model's prediction is off by €{mae:.2f}.")
 
@@ -134,9 +138,9 @@ print(f"On average, the model's prediction is off by €{mae:.2f}.")
 # Plot 1: Feature Importance
 plt.figure(figsize=(10, 6))
 xgb.plot_importance(model, max_num_features=15, height=0.5)
-plt.title('Top 15 Most Important Features')
+plt.title("Top 15 Most Important Features")
 plt.tight_layout()
-plt.savefig('feature_importance.png')
+plt.savefig("feature_importance.png")
 print("Saved feature_importance.png")
 
 # Plot 2: Actual vs Predicted Prices (Subset of 100 points)
@@ -147,26 +151,26 @@ subset_idx = np.random.choice(len(y_test), sample_size, replace=False)
 
 # Need to use .iloc for y_test as it is a Series with potential index gaps
 # predictions is a numpy array, so we slice it directly
-plt.plot(y_test.iloc[subset_idx].values, label='Actual Price', marker='o')
-plt.plot(predictions[subset_idx], label='Predicted Price', marker='x', linestyle='--')
+plt.plot(y_test.iloc[subset_idx].values, label="Actual Price", marker="o")
+plt.plot(predictions[subset_idx], label="Predicted Price", marker="x", linestyle="--")
 
-plt.title(f'Actual vs Predicted Prices (Random {sample_size} samples)')
-plt.ylabel('Price in €')
+plt.title(f"Actual vs Predicted Prices (Random {sample_size} samples)")
+plt.ylabel("Price_in_EUR")
 plt.legend()
 plt.grid(True, alpha=0.3)
-plt.savefig('prediction_comparison.png')
+plt.savefig("prediction_comparison.png")
 print("Saved prediction_comparison.png")
 
 # 7. SAVE MODEL FOR DEPLOYMENT
 print("Saving model and artifacts...")
 
 # 1. Save the model object
-joblib.dump(model, 'flight_price_xgb_model.joblib')
+joblib.dump(model, "flight_price_xgb_model.joblib")
 print(" - Model saved to 'flight_price_xgb_model.joblib'")
 
 # 2. Save the feature names
 model_columns = list(X_train.columns)
-joblib.dump(model_columns, 'model_features.joblib')
+joblib.dump(model_columns, "model_features.joblib")
 print(" - Model features list saved to 'model_features.joblib'")
 
 print("\n--- DEPLOYMENT GUIDE ---")
@@ -174,5 +178,7 @@ print("To use this model in your website app:")
 print("1. Load model:   model = joblib.load('flight_price_xgb_model.joblib')")
 print("2. Load columns: model_columns = joblib.load('model_features.joblib')")
 print("3. Preprocess new user input (create DataFrame, get_dummies, etc).")
-print("4. Align columns: input_df = input_df.reindex(columns=model_columns, fill_value=0)")
+print(
+    "4. Align columns: input_df = input_df.reindex(columns=model_columns, fill_value=0)"
+)
 print("5. Predict:      price = model.predict(input_df)")

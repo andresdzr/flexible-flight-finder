@@ -75,7 +75,7 @@ def compute_statistics(
 
     for date in dates:
         day_flights = filtered_df.filter(pl.col("Date") == date)
-        prices = day_flights["Price in €"].to_list()
+        prices = day_flights["Price_in_EUR"].to_list()
 
         if prices:
             avg_price, median_price, min_price, max_price = (
@@ -99,11 +99,11 @@ def compute_statistics(
         filtered_df.group_by(["Origin", "Destination"])
         .agg(
             [
-                pl.col("Price in €").median().alias("median_price"),
-                pl.col("Price in €").min().alias("min_price"),
-                pl.col("Price in €").mean().alias("avg_price"),
-                pl.col("Price in €").max().alias("max_price"),
-                pl.col("Price in €").count().alias("flight_count"),
+                pl.col("Price_in_EUR").median().alias("median_price"),
+                pl.col("Price_in_EUR").min().alias("min_price"),
+                pl.col("Price_in_EUR").mean().alias("avg_price"),
+                pl.col("Price_in_EUR").max().alias("max_price"),
+                pl.col("Price_in_EUR").count().alias("flight_count"),
                 pl.col("Distance_km").mean().alias("avg_distance"),
             ]
         )
@@ -154,11 +154,11 @@ def compute_statistics(
     weekday_stats = []
     weekday_df = filtered_df.group_by("Weekday").agg(
         [
-            pl.col("Price in €").mean().alias("avg_price"),
-            pl.col("Price in €").median().alias("median_price"),
-            pl.col("Price in €").min().alias("min_price"),
-            pl.col("Price in €").max().alias("max_price"),
-            pl.col("Price in €").count().alias("flight_count"),
+            pl.col("Price_in_EUR").mean().alias("avg_price"),
+            pl.col("Price_in_EUR").median().alias("median_price"),
+            pl.col("Price_in_EUR").min().alias("min_price"),
+            pl.col("Price_in_EUR").max().alias("max_price"),
+            pl.col("Price_in_EUR").count().alias("flight_count"),
         ]
     )
 
@@ -183,11 +183,11 @@ def compute_statistics(
         filtered_df.group_by(["Year", "Month"])
         .agg(
             [
-                pl.col("Price in €").mean().alias("avg_price"),
-                pl.col("Price in €").median().alias("median_price"),
-                pl.col("Price in €").min().alias("min_price"),
-                pl.col("Price in €").max().alias("max_price"),
-                pl.col("Price in €").count().alias("flight_count"),
+                pl.col("Price_in_EUR").mean().alias("avg_price"),
+                pl.col("Price_in_EUR").median().alias("median_price"),
+                pl.col("Price_in_EUR").min().alias("min_price"),
+                pl.col("Price_in_EUR").max().alias("max_price"),
+                pl.col("Price_in_EUR").count().alias("flight_count"),
             ]
         )
         .sort(["Year", "Month"])
@@ -225,7 +225,8 @@ def compute_statistics(
     for min_price, max_price in price_buckets:
         count = len(
             filtered_df.filter(
-                (pl.col("Price in €") >= min_price) & (pl.col("Price in €") < max_price)
+                (pl.col("Price_in_EUR") >= min_price)
+                & (pl.col("Price_in_EUR") < max_price)
             )
         )
         if count > 0:
@@ -239,7 +240,7 @@ def compute_statistics(
             )
 
     # Handle prices >= 1000
-    high_price_count = len(filtered_df.filter(pl.col("Price in €") >= 1000))
+    high_price_count = len(filtered_df.filter(pl.col("Price_in_EUR") >= 1000))
     if high_price_count > 0:
         percentage = round((high_price_count / total_flights) * 100, 2)
         price_distribution.append(

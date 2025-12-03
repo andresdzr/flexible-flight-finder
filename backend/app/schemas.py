@@ -13,6 +13,7 @@ class City(BaseModel):
     """City information with name and coordinates."""
 
     name: str = Field(..., description="City name")
+    country_code: Optional[str] = Field(None, description="ISO 3166-1 alpha-2 country code")
     coords: Coordinates = Field(..., description="Geographic coordinates")
 
 
@@ -53,6 +54,9 @@ class FlightDetail(BaseModel):
     year: int = Field(..., description="Year")
     month: int = Field(..., description="Month")
     day: int = Field(..., description="Day of month")
+    return_date: Optional[str] = Field(None, description="Return date (YYYY-MM-DD)")
+    superdeal: bool = Field(False, description="Whether this flight is a super deal")
+    savings: Optional[float] = Field(None, description="Amount saved compared to prediction")
 
 
 class CityPricingResponse(BaseModel):
