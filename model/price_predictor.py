@@ -35,6 +35,9 @@ for filename in all_files:
     # Standardize price column name
     if "Price_in_€" in df.columns:
         df.rename(columns={"Price_in_€": "Price_in_EUR"}, inplace=True)
+    df["Price_in_EUR"] = df["Price_in_EUR"].astype(float).astype(int)
+    df["Distance_km"] = df["Distance_km"].astype(float).astype(int)
+
     df_list.append(df)
 
 # Concatenate all dataframes

@@ -6,6 +6,7 @@ from typing import Optional
 
 import polars as pl
 import requests
+import airportsdata
 from app.schemas import City, Coordinates
 
 
@@ -118,6 +119,24 @@ class DataLoader:
 
         print(f"Loaded {len(self.df)} flight records")
         print(f"Columns: {self.df.columns}")
+
+        # Map city codes to real names
+        print("Mapping city codes to real names...")
+        airports = airportsdata.load("IATA")
+        
+        # Create a mapping dictionary: IATA code -> City, Country
+        # We use a fallback to the code itself if not found
+        def get_city_name(code):
+            if code in airports:
+                return f"{airports[code]['city']}, {airports[code]['country']}"
+            return code
+
+        # Apply mapping to Origin and Destination
+        # Note: Polars map_elements is efficient for this
+        self.df = self.df.with_columns([
+            pl.col("Origin").map_elements(get_city_name, return_dtype=pl.Utf8).alias("Origin"),
+            pl.col("Destination").map_elements(get_city_name, return_dtype=pl.Utf8).alias("Destination")
+        ])
 
         # Get unique cities
         unique_cities = set(
