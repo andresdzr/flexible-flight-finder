@@ -8,7 +8,6 @@ A full-stack web application for exploring and analyzing European flight data wi
 .
 ├── backend/          # FastAPI backend server
 ├── frontend/         # React + TypeScript frontend
-├── db/               # PostgreSQL database setup
 ├── scraper/          # Data collection scripts
 └── doc/              # Documentation and diagrams
 ```
@@ -45,14 +44,16 @@ Navigate to `http://localhost:5173` in your browser to explore the flight map!
 - 📊 Price-based color coding for easy comparison
 - ✈️ Dynamic route visualization with gradient colors
 - 💰 Cheapest flight finder per route
+- 🔮 ML-powered price forecasting
+- ✨ Automatic detection of flights priced significantly below prediction
 - 📈 Real-time data fetching with caching
 
 ## Documentation
 
 - [Backend README](./backend/README.md) - API documentation and setup
 - [Frontend README](./frontend/README.md) - UI components and usage guide
-- [Database README](./db/README.md) - Database schema and setup
 - [Scraper README](./scraper/README.md) - Data collection process
+- [Price Prediction Model README](./model/README.md) - XGBoost Price Prediction Model
 - [Classification Model README](./model/Kayak%20Data%20model/README.md) - Classification Model Description
 - [Optimization Model README](./model/Optimization%20Model/README.md) - Optimizer Model Description
 
@@ -62,6 +63,7 @@ Navigate to `http://localhost:5173` in your browser to explore the flight map!
 - FastAPI
 - Polars (for data processing)
 - Python 3.11+
+- XGBoost & Scikit-Learn (for price prediction)
 
 ### Frontend
 - React 19
@@ -70,9 +72,6 @@ Navigate to `http://localhost:5173` in your browser to explore the flight map!
 - TanStack Query
 - shadcn/ui + Tailwind CSS
 
-### Database
-- PostgreSQL
-- Docker Compose
 
 ## License
 
