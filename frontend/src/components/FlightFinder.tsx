@@ -6,7 +6,7 @@ import { CityAutocomplete } from "@/components/CityAutocomplete";
 
 export function FlightFinder() {
   const navigate = useNavigate();
-  const [origin, setOrigin] = useState("");
+  const [origin, setOrigin] = useState("Madrid");
   const [minDays, setMinDays] = useState(4);
   const [maxDays, setMaxDays] = useState(7);
   const [startDate, setStartDate] = useState("2025-12-30");
@@ -93,9 +93,8 @@ export function FlightFinder() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {/* Duration Range */}
           <div
-            className={`space-y-2 transition-opacity duration-200 ${
-              oneWay ? "opacity-50" : ""
-            }`}
+            className={`space-y-2 transition-opacity duration-200 ${oneWay ? "opacity-50" : ""
+              }`}
           >
             <label className="text-sm font-medium text-gray-700 dark:text-gray-300 flex items-center gap-2">
               <Clock className="w-4 h-4" />
