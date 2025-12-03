@@ -36,7 +36,7 @@ export default function MainScreen() {
         <div className="mb-12 text-center">
           <div className="inline-block bg-blue-100 dark:bg-blue-900 rounded-full px-6 py-2 mb-6">
             <span className="text-blue-800 dark:text-blue-200 font-semibold">
-              500,000+ flights analyzed
+              400,000+ flights analyzed
             </span>
           </div>
           <h2 className="text-3xl font-bold text-gray-800 dark:text-gray-200 mb-4">
