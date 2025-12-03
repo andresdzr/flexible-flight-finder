@@ -124,9 +124,28 @@ class DataLoader:
         print("Mapping city codes to real names...")
         airports = airportsdata.load("IATA")
         
+        # Manual mapping for metropolitan codes not in airportsdata
+        METRO_CODES = {
+            "LON": "London, GB",
+            "PAR": "Paris, FR",
+            "MIL": "Milan, IT",
+            "ROM": "Rome, IT",
+            "STO": "Stockholm, SE",
+            "BER": "Berlin, DE",
+            "NYC": "New York, US",
+            "TYO": "Tokyo, JP",
+            "BKK": "Bangkok, TH",
+            "IST": "Istanbul, TR",
+            "MOW": "Moscow, RU",
+            "KIE": "Kiev, UA",
+            "BUH": "Bucharest, RO",
+        }
+        
         # Create a mapping dictionary: IATA code -> City, Country
         # We use a fallback to the code itself if not found
         def get_city_name(code):
+            if code in METRO_CODES:
+                return METRO_CODES[code]
             if code in airports:
                 return f"{airports[code]['city']}, {airports[code]['country']}"
             return code
@@ -137,6 +156,12 @@ class DataLoader:
             pl.col("Origin").map_elements(get_city_name, return_dtype=pl.Utf8).alias("Origin"),
             pl.col("Destination").map_elements(get_city_name, return_dtype=pl.Utf8).alias("Destination")
         ])
+
+        # Hotfix Roma, IT to Rome, IT
+        self.df = self.df.with_columns(
+            pl.col("Origin").replace({"Roma, IT": "Rome, IT"}).alias("Origin"),
+            pl.col("Destination").replace({"Roma, IT": "Rome, IT"}).alias("Destination"),
+        )
 
         # Get unique cities
         unique_cities = set(
