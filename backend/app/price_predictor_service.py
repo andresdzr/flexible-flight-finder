@@ -5,11 +5,6 @@ from typing import List, Dict, Any, Optional
 import pandas as pd
 import numpy as np
 
-# Configure logging
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
-
-
 class PricePredictorService:
     def __init__(self, model_dir: Optional[str] = None):
         if model_dir is None:
@@ -31,7 +26,7 @@ class PricePredictorService:
             features_path = os.path.join(self.model_dir, "model_features.joblib")
 
             if not os.path.exists(model_path):
-                logger.warning(f"Model file not found at {model_path}. Prediction disabled.")
+                print(f"Model file not found at {model_path}. Prediction disabled.")
                 return
 
             self.model = joblib.load(model_path)
@@ -44,13 +39,12 @@ class PricePredictorService:
             elif hasattr(self.model, "get_booster"):
                 self.model_features = self.model.get_booster().feature_names
             else:
-                logger.warning("Could not determine model features. Prediction might fail.")
+                print("Could not determine model features. Prediction might fail.")
                 self.model_features = []
 
             self.is_loaded = True
-            logger.info("Price prediction model loaded successfully.")
         except Exception as e:
-            logger.error(f"Failed to load price prediction model: {e}")
+            print(f"Error loading model: {e}. Prediction disabled.")
             self.is_loaded = False
 
     def predict_price(self, flight_data: Dict[str, Any]) -> Optional[float]:
@@ -77,12 +71,10 @@ class PricePredictorService:
 
             df = pd.DataFrame(input_data)
 
-            # One-hot encode Weekday
+            # One-hot encode like in model
             df_encoded = pd.get_dummies(df, columns=["Weekday"])
 
-            # Align columns with model features
-            # This handles missing columns (fills with 0) and extra columns (drops them)
-            # This is the "reindex" magic that pandas does well
+            # Align columns with model features (thanks pandas)
             if self.model_features:
                 df_final = df_encoded.reindex(columns=self.model_features, fill_value=0)
             else:
@@ -93,7 +85,7 @@ class PricePredictorService:
             return float(predicted_price)
 
         except Exception as e:
-            logger.error(f"Error predicting price: {e}")
+            print(f"Error predicting price: {e}")
             return None
 
     def predict_trend(
@@ -121,11 +113,11 @@ class PricePredictorService:
             
             # Predict for next 7 days
             for i in range(1, 8):
-                # Shift outbound date
+                # departure + i days
                 next_date = base_date + timedelta(days=i)
                 next_date_str = next_date.strftime("%Y-%m-%d")
                 
-                # Prepare outbound data
+                # Predict departure
                 outbound_data = flight_data.copy()
                 outbound_data["date"] = next_date_str
                 outbound_data["weekday"] = next_date.strftime("%A")
@@ -136,7 +128,6 @@ class PricePredictorService:
                 current_days_until = outbound_data.get("days_until_departure", 0)
                 outbound_data["days_until_departure"] = current_days_until + i
 
-                # Predict outbound
                 pred_outbound = self.predict_price(outbound_data)
                 
                 if pred_outbound is None:
@@ -144,7 +135,7 @@ class PricePredictorService:
 
                 total_pred = pred_outbound
 
-                # Handle return leg if exists
+                # Return flight for two way flights
                 if return_date:
                     next_return_date = return_date + timedelta(days=i)
                     next_return_date_str = next_return_date.strftime("%Y-%m-%d")
@@ -162,16 +153,6 @@ class PricePredictorService:
                     return_data["month"] = next_return_date.month
                     return_data["day"] = next_return_date.day
                     
-                    # Calculate days until for return leg
-                    # Assuming booking is done 'now', so days_until increases by i
-                    # But the base days_until for return is different.
-                    # Let's approximate: original days_until + duration + i
-                    # Or simpler: if we have the dates, we can't easily recalculate days_until without 'now'.
-                    # But we know outbound_days_until increases by i.
-                    # Return leg is just another flight.
-                    # Let's assume the gap between outbound and return stays the same.
-                    # So return_days_until = outbound_days_until + (return_date - base_date).days
-                    
                     trip_duration_days = (return_date - base_date).days
                     return_data["days_until_departure"] = outbound_data["days_until_departure"] + trip_duration_days
 
@@ -180,7 +161,6 @@ class PricePredictorService:
                     if pred_return is not None:
                         total_pred += pred_return
                     else:
-                        # If return prediction fails, maybe skip this day?
                         continue
 
                 predictions.append(total_pred)
@@ -190,6 +170,7 @@ class PricePredictorService:
 
             avg_predicted_price = sum(predictions) / len(predictions)
             
+            # addition only needed because we don't have Amadeus Prod Key yet
             if (return_date):
                 diff = avg_predicted_price - current_price + 100
             else:
@@ -203,7 +184,6 @@ class PricePredictorService:
                 return "stable"
 
         except Exception as e:
-            logger.error(f"Error predicting trend: {e}")
             return "stable"
 
 # Singleton instance
