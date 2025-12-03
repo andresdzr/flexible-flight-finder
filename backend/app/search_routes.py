@@ -156,11 +156,18 @@ async def search_flights(
                                 "year": int(dept_date_str.split("-")[0]),
                                 "month": int(dept_date_str.split("-")[1]),
                                 "day": int(dept_date_str.split("-")[2]),
-                                "days_until_departure": days_until
+                                "days_until_departure": days_until,
+                                "origin_lat": origin_obj.coords.lat,
+                                "origin_lon": origin_obj.coords.lon,
+                                "dest_lat": dest_obj.coords.lat,
+                                "dest_lon": dest_obj.coords.lon,
+                                "return_date": return_date_str
                             }
 
-                            predicted_price = price_predictor.predict_price(flight_data_for_pred)
-                            is_superdeal, savings = price_predictor.check_superdeal(price_total, predicted_price)
+                            # predicted_price = price_predictor.predict_price(flight_data_for_pred)
+                            # is_superdeal, savings = price_predictor.check_superdeal(price_total, predicted_price)
+                            
+                            trend = price_predictor.predict_trend(flight_data_for_pred, price_total)
 
                             flight = FlightDetail(
                                 origin=origin_obj,
@@ -177,8 +184,7 @@ async def search_flights(
                                 year=int(dept_date_str.split("-")[0]),
                                 month=int(dept_date_str.split("-")[1]),
                                 day=int(dept_date_str.split("-")[2]),
-                                superdeal=is_superdeal,
-                                savings=savings if is_superdeal else None
+                                price_trend=trend
                             )
 
                             flight_dict = flight.model_dump()

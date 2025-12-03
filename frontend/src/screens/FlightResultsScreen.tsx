@@ -10,7 +10,9 @@ import {
   Ruler,
   Loader2,
   ArrowRightLeft,
-  Sparkles,
+  TrendingUp,
+  TrendingDown,
+  Minus,
 } from "lucide-react";
 import type { FlightDetail } from "@/types/api";
 
@@ -315,10 +317,31 @@ export default function FlightResultsScreen() {
                         <div className="text-xs text-gray-500 mt-1">
                           per person
                         </div>
-                        {flight.superdeal && (
-                          <div className="mt-2 inline-flex items-center gap-1 px-2 py-1 bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 rounded-full text-xs font-bold animate-pulse">
-                            <Sparkles className="w-3 h-3" />
-                            <span>Super Deal! Save €{Math.round(flight.savings || 0)}</span>
+                        {flight.price_trend && (
+                          <div
+                            className={`mt-2 inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-bold ${flight.price_trend === "falling"
+                              ? "bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400"
+                              : flight.price_trend === "rising"
+                                ? "bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400"
+                                : "bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400"
+                              }`}
+                          >
+                            {flight.price_trend === "falling" ? (
+                              <>
+                                <TrendingDown className="w-3 h-3" />
+                                <span>Price expected to fall the next 7 days</span>
+                              </>
+                            ) : flight.price_trend === "rising" ? (
+                              <>
+                                <TrendingUp className="w-3 h-3" />
+                                <span>Price expected to rise the next 7 days</span>
+                              </>
+                            ) : (
+                              <>
+                                <Minus className="w-3 h-3" />
+                                <span>Price expected to be stable the next 7 days</span>
+                              </>
+                            )}
                           </div>
                         )}
                       </div>

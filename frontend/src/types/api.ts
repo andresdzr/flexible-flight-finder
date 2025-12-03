@@ -44,8 +44,7 @@ export interface FlightDetail {
   month: number;
   day: number;
   return_date?: string;
-  superdeal?: boolean;
-  savings?: number;
+  price_trend?: "rising" | "falling" | "stable";
 }
 
 export interface FlightSearchResponse {
