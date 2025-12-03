@@ -249,7 +249,7 @@ export default function StatsScreen() {
                 from={stats.metadata.date_range_start}
                 to={stats.metadata.date_range_end}
                 emptyColor="#eeeeee"
-                colors={["#61cdbb", "#97e3d5", "#e8c1a0", "#f47560"]}
+                colors={["#2ecab0ff", "#97e3d5", "#e8c1a0", "#f47560"]}
                 margin={{ top: 40, right: 40, bottom: 40, left: 40 }}
                 yearSpacing={40}
                 monthBorderColor="#ffffff"
@@ -290,7 +290,7 @@ export default function StatsScreen() {
           <Card className="p-6">
             <h2 className="text-2xl font-bold mb-4 flex items-center gap-2 text-gray-900 dark:text-white">
               <TrendingDown className="w-6 h-6" />
-              Top 20 Cheapest Routes
+              Top 20 Cheapest Routes by Median Price
             </h2>
             <div className="h-[600px]">
               <ResponsiveBar

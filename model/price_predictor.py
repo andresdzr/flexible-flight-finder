@@ -9,7 +9,7 @@ import glob
 import os
 import joblib
 
-PRICE_THRESHOLD = 250
+PRICE_THRESHOLD = 300
 DATA_DIR = "./data"
 
 # 1. LOAD AND MERGE DATA
@@ -35,6 +35,11 @@ for filename in all_files:
     # Standardize price column name
     if "Price_in_€" in df.columns:
         df.rename(columns={"Price_in_€": "Price_in_EUR"}, inplace=True)
+    df["Price_in_EUR"] = df["Price_in_EUR"].astype(float).astype(int)
+    df["Distance_km"] = df["Distance_km"].astype(float).astype(int)
+    df = df[df["Price_in_EUR"] <= PRICE_THRESHOLD].copy()
+
+
     df_list.append(df)
 
 # Concatenate all dataframes
@@ -51,9 +56,7 @@ def preprocess_data(df):
     """
     Cleans the dataframe and separates Features (X) from Target (y).
     """
-    # Filter out prices above the threshold to remove outliers
-    # We do this BEFORE splitting X and y to ensure indices match
-    df_clean = df[df["Price_in_EUR"] <= PRICE_THRESHOLD].copy()
+    df_clean = df.copy()
 
     # List all columns we want to remove from the feature set (X)
     # We remove the target 'Price_in_EUR' and irrelevant/redundant cols
