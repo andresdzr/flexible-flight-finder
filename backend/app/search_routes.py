@@ -1,6 +1,7 @@
 from fastapi import APIRouter, Query
 from app.schemas import FlightDetail, City, Coordinates
 from app.search_schemas import FlightSearchResponse
+from app.price_predictor_service import price_predictor
 import random
 from typing import Optional
 
@@ -143,6 +144,24 @@ async def search_flights(
                             if max_price and price_total > max_price:
                                 continue
 
+                            days_until = (datetime.strptime(dept_date_str, "%Y-%m-%d") - datetime.now()).days
+                            days_until = max(0, days_until)
+
+                            flight_data_for_pred = {
+                                "origin": origin_code,
+                                "destination": dest_code,
+                                "date": dept_date_str,
+                                "distance_km": distance,
+                                "weekday": datetime.strptime(dept_date_str, "%Y-%m-%d").strftime("%A"),
+                                "year": int(dept_date_str.split("-")[0]),
+                                "month": int(dept_date_str.split("-")[1]),
+                                "day": int(dept_date_str.split("-")[2]),
+                                "days_until_departure": days_until
+                            }
+
+                            predicted_price = price_predictor.predict_price(flight_data_for_pred)
+                            is_superdeal, savings = price_predictor.check_superdeal(price_total, predicted_price)
+
                             flight = FlightDetail(
                                 origin=origin_obj,
                                 destination=dest_obj,
@@ -158,6 +177,8 @@ async def search_flights(
                                 year=int(dept_date_str.split("-")[0]),
                                 month=int(dept_date_str.split("-")[1]),
                                 day=int(dept_date_str.split("-")[2]),
+                                superdeal=is_superdeal,
+                                savings=savings if is_superdeal else None
                             )
 
                             flight_dict = flight.model_dump()

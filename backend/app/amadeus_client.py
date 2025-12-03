@@ -80,6 +80,7 @@ class AmadeusClient:
             try:
                 response = await client.get(url, params=params, headers=headers)
                 response.raise_for_status()
+                print(response.json())
                 return response.json()
             except httpx.HTTPError as e:
                 print(f"Amadeus API request failed: {e}")

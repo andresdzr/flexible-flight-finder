@@ -55,6 +55,8 @@ class FlightDetail(BaseModel):
     month: int = Field(..., description="Month")
     day: int = Field(..., description="Day of month")
     return_date: Optional[str] = Field(None, description="Return date (YYYY-MM-DD)")
+    superdeal: bool = Field(False, description="Whether this flight is a super deal")
+    savings: Optional[float] = Field(None, description="Amount saved compared to prediction")
 
 
 class CityPricingResponse(BaseModel):

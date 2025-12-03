@@ -10,6 +10,7 @@ import {
   Ruler,
   Loader2,
   ArrowRightLeft,
+  Sparkles,
 } from "lucide-react";
 import type { FlightDetail } from "@/types/api";
 
@@ -314,6 +315,12 @@ export default function FlightResultsScreen() {
                         <div className="text-xs text-gray-500 mt-1">
                           per person
                         </div>
+                        {flight.superdeal && (
+                          <div className="mt-2 inline-flex items-center gap-1 px-2 py-1 bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 rounded-full text-xs font-bold animate-pulse">
+                            <Sparkles className="w-3 h-3" />
+                            <span>Super Deal! Save €{Math.round(flight.savings || 0)}</span>
+                          </div>
+                        )}
                       </div>
                       <button className="px-6 py-3 bg-gray-900 dark:bg-white text-white dark:text-gray-900 font-bold rounded-xl hover:bg-gray-800 dark:hover:bg-gray-100 transition-all shadow-lg hover:shadow-xl hover:-translate-y-0.5 w-full active:scale-95">
                         Select Flight

@@ -44,6 +44,8 @@ export interface FlightDetail {
   month: number;
   day: number;
   return_date?: string;
+  superdeal?: boolean;
+  savings?: number;
 }
 
 export interface FlightSearchResponse {
