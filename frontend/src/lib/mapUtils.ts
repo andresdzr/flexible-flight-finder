@@ -8,13 +8,15 @@ import type { FlightRoute } from "@/types/api";
  * @param minPrice Minimum price in the dataset
  * @param maxPrice Maximum price in the dataset
  * @param isDark Whether dark mode is active
- * @returns HSL color string
+ * @param opacity Optional opacity value (0-1) to create HSLA color
+ * @returns HSL or HSLA color string
  */
 export const getPriceColor = (
   price: number,
   minPrice: number,
   maxPrice: number,
-  isDark = false
+  isDark = false,
+  opacity?: number
 ): string => {
   // Normalize price between 0 and 1
   const normalized =
@@ -26,6 +28,10 @@ export const getPriceColor = (
   // Adjust saturation and lightness for theme
   const saturation = isDark ? 70 : 80;
   const lightness = isDark ? 55 : 50;
+
+  if (opacity !== undefined) {
+    return `hsla(${hue}, ${saturation}%, ${lightness}%, ${opacity})`;
+  }
 
   return `hsl(${hue}, ${saturation}%, ${lightness}%)`;
 };
@@ -49,6 +55,27 @@ export const getMarkerColor = (priceRange: string): string => {
       return "var(--destructive)";
     default:
       return "var(--muted-foreground)";
+  }
+};
+
+/**
+ * Get marker color based on price_range category
+ * Returns hex colors compatible with Three.js
+ * @param priceRange Price range category
+ * @returns Hex color string
+ */
+export const getHexMarkerColor = (priceRange: string): string => {
+  switch (priceRange) {
+    case "budget":
+      return "#22c55e"; // green
+    case "moderate":
+      return "#eab308"; // yellow
+    case "expensive":
+      return "#f97316"; // orange
+    case "premium":
+      return "#ef4444"; // red
+    default:
+      return "#9ca3af"; // gray
   }
 };
 

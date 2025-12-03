@@ -53,6 +53,8 @@ Navigate to `http://localhost:5173` in your browser to explore the flight map!
 - [Frontend README](./frontend/README.md) - UI components and usage guide
 - [Database README](./db/README.md) - Database schema and setup
 - [Scraper README](./scraper/README.md) - Data collection process
+- [Classification Model README](./model/Kayak%20Data%20model/README.md) - Classification Model Description
+- [Optimization Model README](./model/Optimization%20Model/README.md) - Optimizer Model Description
 
 ## Technologies
 
