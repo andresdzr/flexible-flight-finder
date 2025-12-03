@@ -14,7 +14,7 @@ import {
   TrendingDown,
   Minus,
 } from "lucide-react";
-import type { FlightDetail } from "@/types/api";
+import type { FlightDetail, MulticitySearchResponse } from "@/types/api";
 
 export default function FlightResultsScreen() {
   const [searchParams] = useSearchParams();
@@ -28,31 +28,53 @@ export default function FlightResultsScreen() {
   const maxPrice = searchParams.get("maxPrice");
   const nonStop = searchParams.get("nonStop") === "true";
   const oneWay = searchParams.get("oneWay") === "true";
+  const multicity = searchParams.get("multicity") === "true";
+  const cityTypeKey = searchParams.get("cityTypeKey");
 
   const [flights, setFlights] = useState<FlightDetail[]>([]);
+  const [multicityTrip, setMulticityTrip] =
+    useState<MulticitySearchResponse | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchFlights = async () => {
       try {
         setLoading(true);
-        const params = new URLSearchParams();
-        if (minDays) params.append("min_days", minDays);
-        if (maxDays) params.append("max_days", maxDays);
-        if (startMonth) params.append("start_month", startMonth);
-        if (endMonth) params.append("end_month", endMonth);
-        if (startDate) params.append("start_date", startDate);
-        if (endDate) params.append("end_date", endDate);
-        if (maxPrice) params.append("max_price", maxPrice);
-        if (nonStop) params.append("non_stop", "true");
-        if (oneWay) params.append("one_way", "true");
-        if (origin) params.append("origin", origin);
 
-        const response = await fetch(
-          `http://localhost:8000/api/search/flights?${params.toString()}`
-        );
-        const data = await response.json();
-        setFlights(data.flights);
+        if (multicity) {
+          // Fetch multicity trip
+          const params = new URLSearchParams();
+          if (origin) params.append("origin", origin);
+          if (startDate) params.append("start_date", startDate);
+          if (endDate) params.append("end_date", endDate);
+          if (maxPrice) params.append("max_price", maxPrice);
+          if (cityTypeKey) params.append("city_type_key", cityTypeKey);
+
+          const response = await fetch(
+            `http://localhost:8000/api/search/flights/multicity?${params.toString()}`
+          );
+          const data = await response.json();
+          setMulticityTrip(data);
+        } else {
+          // Fetch regular flights
+          const params = new URLSearchParams();
+          if (minDays) params.append("min_days", minDays);
+          if (maxDays) params.append("max_days", maxDays);
+          if (startMonth) params.append("start_month", startMonth);
+          if (endMonth) params.append("end_month", endMonth);
+          if (startDate) params.append("start_date", startDate);
+          if (endDate) params.append("end_date", endDate);
+          if (maxPrice) params.append("max_price", maxPrice);
+          if (nonStop) params.append("non_stop", "true");
+          if (oneWay) params.append("one_way", "true");
+          if (origin) params.append("origin", origin);
+
+          const response = await fetch(
+            `http://localhost:8000/api/search/flights?${params.toString()}`
+          );
+          const data = await response.json();
+          setFlights(data.flights);
+        }
       } catch (error) {
         console.error("Error fetching flights:", error);
       } finally {
@@ -72,6 +94,8 @@ export default function FlightResultsScreen() {
     nonStop,
     oneWay,
     origin,
+    multicity,
+    cityTypeKey,
   ]);
 
   const getFlagEmoji = (countryCode?: string) => {
@@ -166,6 +190,11 @@ export default function FlightResultsScreen() {
                   One way
                 </span>
               )}
+              {multicity && (
+                <span className="px-2 py-0.5 bg-purple-100 dark:bg-purple-900 text-purple-700 dark:text-purple-300 rounded-full text-xs font-medium">
+                  Multi-city
+                </span>
+              )}
             </div>
           </Card>
         </header>
@@ -176,9 +205,139 @@ export default function FlightResultsScreen() {
             <div className="flex flex-col items-center justify-center py-20">
               <Loader2 className="w-12 h-12 text-blue-500 animate-spin mb-4" />
               <p className="text-gray-500 dark:text-gray-400 text-lg">
-                Searching for best flights...
+                {multicity
+                  ? "Optimizing your multi-city trip..."
+                  : "Searching for best flights..."}
               </p>
             </div>
+          ) : multicity && multicityTrip ? (
+            multicityTrip.status === "success" && multicityTrip.trip ? (
+              <div className="space-y-6">
+                {/* Trip Summary Card */}
+                <Card className="p-6 bg-linear-to-r from-purple-50 to-blue-50 dark:from-purple-900/20 dark:to-blue-900/20 border-purple-200 dark:border-purple-800">
+                  <div className="flex items-start justify-between gap-6">
+                    <div className="flex-1">
+                      <div className="flex items-center gap-3 mb-4">
+                        <div>
+                          <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
+                            Optimized Multi-City Trip
+                          </h2>
+                          <p className="text-gray-600 dark:text-gray-400">
+                            {multicityTrip.trip.total_cities} cities •{" "}
+                            {multicityTrip.trip.legs.length} flights
+                          </p>
+                        </div>
+                      </div>
+
+                      {/* Cities Route */}
+                      <div className="flex items-center gap-2 flex-wrap mb-4">
+                        {multicityTrip.trip?.visited_cities.map(
+                          (city, index) => (
+                            <div
+                              key={index}
+                              className="flex items-center gap-2"
+                            >
+                              <span className="px-3 py-1 bg-white dark:bg-gray-800 rounded-lg font-semibold text-gray-900 dark:text-white border border-purple-200 dark:border-purple-700">
+                                {city}
+                              </span>
+                              {multicityTrip.trip &&
+                                index <
+                                multicityTrip.trip.visited_cities.length -
+                                1 && (
+                                  <Plane className="w-4 h-4 text-purple-500 rotate-90" />
+                                )}
+                            </div>
+                          )
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Total Price */}
+                    <div className="text-right">
+                      <div className="text-5xl font-bold text-purple-600 dark:text-purple-400">
+                        €{Math.round(multicityTrip.trip.total_cost)}
+                      </div>
+                      <div className="text-sm text-gray-500 mt-1">
+                        Total trip cost
+                      </div>
+                      <div className="mt-3 inline-flex items-center gap-1 px-3 py-1 bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 rounded-full text-xs font-bold">
+                        <TrendingUp className="w-3 h-3" />
+                        <span>Best Route</span>
+                      </div>
+                    </div>
+                  </div>
+                </Card>
+
+                {/* Flight Legs */}
+                <div className="space-y-3">
+                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                    Flight Itinerary
+                  </h3>
+                  {multicityTrip.trip.legs.map((leg, index) => (
+                    <Card
+                      key={index}
+                      className="p-5 hover:shadow-lg transition-all duration-300"
+                    >
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-6 flex-1">
+                          {/* Leg Number */}
+                          <div className="flex flex-col items-center">
+                            <div className="w-10 h-10 rounded-full bg-purple-600 text-white flex items-center justify-center font-bold text-lg">
+                              {index + 1}
+                            </div>
+                            <div className="text-xs text-gray-500 mt-1">
+                              Leg
+                            </div>
+                          </div>
+
+                          {/* Origin */}
+                          <div className="flex flex-col items-center">
+                            <div className="text-2xl font-bold text-gray-900 dark:text-white mb-1">
+                              {leg.origin}
+                            </div>
+                          </div>
+
+                          {/* Arrow */}
+                          <div className="flex-1 flex items-center justify-center min-w-32">
+                            <div className="w-full h-px bg-gray-300 dark:bg-gray-600 relative flex items-center justify-center">
+                              <Plane className="w-5 h-5 text-purple-500 absolute rotate-90" />
+                            </div>
+                          </div>
+
+                          {/* Destination */}
+                          <div className="flex flex-col items-center">
+                            <div className="text-2xl font-bold text-gray-900 dark:text-white mb-1">
+                              {leg.destination}
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Leg Price */}
+                        <div className="text-right ml-8 min-w-32">
+                          <div className="text-3xl font-bold text-purple-600 dark:text-purple-400">
+                            €{Math.round(leg.price)}
+                          </div>
+                          <div className="text-xs text-gray-500">
+                            per person
+                          </div>
+                        </div>
+                      </div>
+                    </Card>
+                  ))}
+                </div>
+              </div>
+            ) : (
+              <div className="text-center py-20 bg-white/50 dark:bg-gray-800/50 rounded-2xl border border-dashed border-gray-300 dark:border-gray-700">
+                <Plane className="w-16 h-16 text-gray-300 dark:text-gray-600 mx-auto mb-4 rotate-45" />
+                <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">
+                  No optimal trip found
+                </h3>
+                <p className="text-gray-500 dark:text-gray-400 max-w-md mx-auto">
+                  {multicityTrip.message ||
+                    "We couldn't find an optimal multi-city trip within your budget. Try increasing your budget or adjusting your dates."}
+                </p>
+              </div>
+            )
           ) : flights.length === 0 ? (
             <div className="text-center py-20 bg-white/50 dark:bg-gray-800/50 rounded-2xl border border-dashed border-gray-300 dark:border-gray-700">
               <Plane className="w-16 h-16 text-gray-300 dark:text-gray-600 mx-auto mb-4 rotate-45" />

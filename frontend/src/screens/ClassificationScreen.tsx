@@ -7,6 +7,7 @@ import { useTheme } from "next-themes";
 import { type LatLngExpression } from "leaflet";
 import { Info, Compass } from "lucide-react";
 import "leaflet/dist/leaflet.css";
+import classificationData from "@/assets/results.json";
 
 const CITY_COORDS: Record<string, [number, number]> = {
   Madrid: [40.4168, -3.7038],
@@ -34,77 +35,21 @@ const CITY_COORDS: Record<string, [number, number]> = {
 
 const CLASSIFICATION_DATA = {
   geographical: {
-    western_europe: ["London", "Paris", "Amsterdam", "Brussels", "Dublin"],
-    northern_europe: ["Copenhagen", "Stockholm", "Oslo", "Helsinki"],
-    iberian_peninsula: ["Madrid", "Lisbon"],
-    eastern_europe: ["Bucharest", "Istanbul", "Athens"],
-    central_europe: [
-      "Berlin",
-      "Rome",
-      "Vienna",
-      "Zurich",
-      "Prague",
-      "Budapest",
-      "Milan",
-    ],
+    western_europe: classificationData.western_europe || [],
+    northern_europe: classificationData.northern_europe || [],
+    iberian_peninsula: classificationData.iberian_peninsula || [],
+    eastern_europe: classificationData.eastern_europe || [],
+    central_europe: classificationData.central_europe || [],
   },
   louvain_communities: {
-    community_1: [
-      "Budapest",
-      "Prague",
-      "Athens",
-      "Madrid",
-      "Stockholm",
-      "Brussels",
-      "Amsterdam",
-      "Lisbon",
-      "Zurich",
-      "Milan",
-      "Copenhagen",
-    ],
-    community_2: [
-      "Vienna",
-      "London",
-      "Bucharest",
-      "Dublin",
-      "Helsinki",
-      "Paris",
-      "Rome",
-      "Istanbul",
-      "Oslo",
-      "Berlin",
-    ],
+    community_1: classificationData.louvain_community_1 || [],
+    community_2: classificationData.louvain_community_2 || [],
   },
-  budget_hubs: [
-    "Milan",
-    "Brussels",
-    "Stockholm",
-    "London",
-    "Rome",
-    "Budapest",
-    "Paris",
-    "Vienna",
-    "Dublin",
-    "Madrid",
-  ],
+  budget_hubs: classificationData.budget_hubs || [],
   hybrid_clusters: {
-    cluster_0: ["Lisbon", "Stockholm", "Zurich"],
-    cluster_1: [
-      "Athens",
-      "Brussels",
-      "Copenhagen",
-      "Dublin",
-      "Istanbul",
-      "Milan",
-      "Prague",
-      "Berlin",
-      "Rome",
-      "Vienna",
-      "London",
-      "Madrid",
-      "Paris",
-    ],
-    cluster_2: ["Amsterdam", "Budapest", "Helsinki", "Oslo", "Bucharest"],
+    cluster_0: classificationData.cluster_0 || [],
+    cluster_1: classificationData.cluster_1 || [],
+    cluster_2: classificationData.cluster_2 || [],
   },
 };
 
@@ -202,7 +147,7 @@ export default function ClassificationScreen() {
           </div>
         </header>
 
-        {/* Detailed Methodology Section */}
+        {/* Methodology */}
         <Card className="p-8 mt-8">
           <h2 className="text-3xl font-bold mb-6 text-gray-900 dark:text-white">
             Methodology & Goals

@@ -1,0 +1,97 @@
+{
+    "western_europe": [
+        "London",
+        "Paris",
+        "Amsterdam",
+        "Brussels",
+        "Dublin"
+    ],
+    "northern_europe": [
+        "Copenhagen",
+        "Stockholm",
+        "Oslo",
+        "Helsinki"
+    ],
+    "iberian_peninsula": [
+        "Madrid",
+        "Lisbon"
+    ],
+    "eastern_europe": [
+        "Bucharest",
+        "Istanbul",
+        "Athens"
+    ],
+    "central_europe": [
+        "Berlin",
+        "Rome",
+        "Vienna",
+        "Zurich",
+        "Prague",
+        "Budapest",
+        "Milan"
+    ],
+    "louvain_community_1": [
+        "Budapest",
+        "Prague",
+        "Athens",
+        "Madrid",
+        "Stockholm",
+        "Brussels",
+        "Amsterdam",
+        "Lisbon",
+        "Zurich",
+        "Milan",
+        "Copenhagen"
+    ],
+    "louvain_community_2": [
+        "Vienna",
+        "London",
+        "Bucharest",
+        "Dublin",
+        "Helsinki",
+        "Paris",
+        "Rome",
+        "Istanbul",
+        "Oslo",
+        "Berlin"
+    ],
+    "budget_hubs": [
+        "Milan",
+        "Brussels",
+        "Stockholm",
+        "London",
+        "Rome",
+        "Budapest",
+        "Paris",
+        "Vienna",
+        "Dublin",
+        "Madrid"
+    ],
+    "cluster_0": [
+        "Lisbon",
+        "Stockholm",
+        "Zurich"
+    ],
+    "cluster_1": [
+        "Athens",
+        "Brussels",
+        "Copenhagen",
+        "Dublin",
+        "Istanbul",
+        "Milan",
+        "Prague",
+        "Berlin",
+        "Rome",
+        "Vienna",
+        "London",
+        "Madrid",
+        "Paris"
+    ],
+    "cluster_2": [
+        "Amsterdam",
+        "Budapest",
+        "Helsinki",
+        "Oslo",
+        "Bucharest"
+    ]
+}

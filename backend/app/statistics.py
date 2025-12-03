@@ -6,12 +6,6 @@ from datetime import datetime
 from typing import Optional
 from app.data_loader import get_data_loader
 from app.schemas import (
-    CalendarDayPrice,
-    CheapestRoute,
-    WeekdayStats,
-    MonthlyStats,
-    PriceDistribution,
-    StatisticsMetadata,
     StatisticsResponse,
 )
 
@@ -55,7 +49,6 @@ def compute_statistics(
     """
     loader = get_data_loader()
 
-    # Apply date filters if provided
     filtered_df = df
     if start_date:
         filtered_df = filtered_df.filter(
@@ -69,11 +62,10 @@ def compute_statistics(
     if len(filtered_df) == 0:
         raise ValueError("No flights found in the specified date range")
 
-    # Get date range
     date_range_start = str(filtered_df["Date"].min())
     date_range_end = str(filtered_df["Date"].max())
 
-    # 1. Calendar data - daily average/median prices
+    # calendar data - daily average/median prices
     calendar_data = []
     dates = filtered_df["Date"].unique().sort().to_list()
 
@@ -97,7 +89,7 @@ def compute_statistics(
                 }
             )
 
-    # 2. Top 20 cheapest routes by median price
+    # top 20 cheapest routes by median price
     cheapest_routes = []
     routes_df = (
         filtered_df.group_by(["Origin", "Destination"])
@@ -145,7 +137,7 @@ def compute_statistics(
                 }
             )
 
-    # 3. Weekday statistics
+    # weekday price analysis
     weekday_order = [
         "Monday",
         "Tuesday",
@@ -181,7 +173,7 @@ def compute_statistics(
                 }
             )
 
-    # 4. Monthly statistics
+    # monthly statistics
     monthly_stats = []
     monthly_df = (
         filtered_df.group_by(["Year", "Month"])
@@ -211,7 +203,7 @@ def compute_statistics(
             }
         )
 
-    # 5. Price distribution
+    # price distribution
     price_buckets = [
         (0, 50),
         (50, 100),
@@ -243,7 +235,7 @@ def compute_statistics(
                 }
             )
 
-    # Handle prices >= 1000
+    # handle very high prices separately
     high_price_count = len(filtered_df.filter(pl.col("Price_in_EUR") >= 1000))
     if high_price_count > 0:
         percentage = round((high_price_count / total_flights) * 100, 2)
@@ -255,7 +247,6 @@ def compute_statistics(
             }
         )
 
-    # Count unique routes
     unique_routes = filtered_df.select(["Origin", "Destination"]).unique().height
 
     return {
@@ -286,13 +277,12 @@ def load_from_cache(
         with open(CACHE_FILE, "r") as f:
             cache_data = json.load(f)
 
-        # Check if cache matches the requested filters
         cached_filters = cache_data.get("filters", {})
         if (
             cached_filters.get("start_date") == start_date
             and cached_filters.get("end_date") == end_date
         ):
-            # Mark as cache hit
+            # cache hit
             cache_data["statistics"]["metadata"]["cache_hit"] = True
             return cache_data["statistics"]
 
@@ -347,16 +337,14 @@ async def get_statistics(
         if df is None:
             raise HTTPException(status_code=500, detail="Data not loaded")
 
-        # Try to load from cache if not forcing refresh
+        # try to load from cache if not forcing refresh
         if not refresh:
             cached_stats = load_from_cache(start_date, end_date)
             if cached_stats:
                 return StatisticsResponse(**cached_stats)
 
-        # Compute statistics
         statistics = compute_statistics(df, start_date, end_date)
 
-        # Save to cache
         save_to_cache(statistics, start_date, end_date)
 
         return StatisticsResponse(**statistics)

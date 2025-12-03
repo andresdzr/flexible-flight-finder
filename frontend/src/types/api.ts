@@ -134,3 +134,23 @@ export interface StatisticsResponse {
   price_distribution: PriceDistribution[];
   metadata: StatisticsMetadata;
 }
+
+export interface MulticityLeg {
+  origin: string;
+  destination: string;
+  price: number;
+}
+
+export interface MulticityTrip {
+  origin: string;
+  visited_cities: string[];
+  legs: MulticityLeg[];
+  total_cost: number;
+  total_cities: number;
+}
+
+export interface MulticitySearchResponse {
+  trip: MulticityTrip | null;
+  status: string;
+  message?: string;
+}

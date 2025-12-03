@@ -28,10 +28,8 @@ async def get_cities_pricing():
         if df is None:
             raise HTTPException(status_code=500, detail="Data not loaded")
 
-        # Group by destination city
         destinations = df["Destination"].unique().to_list()
 
-        # First pass: collect all average prices for relative categorization
         city_data = []
         for dest_city in destinations:
             flights_to_city = df.filter(pl.col("Destination") == dest_city)
@@ -40,7 +38,6 @@ async def get_cities_pricing():
             if not prices:
                 continue
 
-            # Calculate statistics excluding high outliers
             avg_price, median_price, min_price, max_price = (
                 loader.calculate_price_statistics(prices, exclude_high_outliers=True)
             )
@@ -59,10 +56,8 @@ async def get_cities_pricing():
                 }
             )
 
-        # Extract all average prices for categorization
         all_avg_prices = [d["avg_price"] for d in city_data]
 
-        # Second pass: categorize and build response
         city_pricing_list = []
         for data in city_data:
             price_range = loader.categorize_price_relative(
@@ -79,7 +74,6 @@ async def get_cities_pricing():
             )
             city_pricing_list.append(city_pricing)
 
-        # Sort by average price
         city_pricing_list.sort(key=lambda x: x.average_price)
 
         return CityPricingResponse(
@@ -105,14 +99,12 @@ async def get_city_flights(city_name: str):
         if df is None:
             raise HTTPException(status_code=500, detail="Data not loaded")
 
-        # Get origin city info
         origin_city = loader.get_city(city_name)
         if not origin_city:
             raise HTTPException(
                 status_code=404, detail=f"City '{city_name}' not found or not geocoded"
             )
 
-        # Filter flights from this city
         flights_from_city = df.filter(pl.col("Origin") == city_name)
 
         if len(flights_from_city) == 0:
@@ -120,7 +112,6 @@ async def get_city_flights(city_name: str):
                 status_code=404, detail=f"No flights found from '{city_name}'"
             )
 
-        # Group by destination and calculate price ranges
         destinations = flights_from_city["Destination"].unique().to_list()
         routes = []
 
@@ -133,7 +124,6 @@ async def get_city_flights(city_name: str):
             if not prices:
                 continue
 
-            # Calculate statistics excluding high outliers
             avg_price, median_price, min_price, max_price = (
                 loader.calculate_price_statistics(prices, exclude_high_outliers=True)
             )
@@ -153,10 +143,8 @@ async def get_city_flights(city_name: str):
             )
             routes.append(route)
 
-        # Sort routes by average price
         routes.sort(key=lambda x: x.avg_price)
 
-        # Get top 5 cheapest individual flights
         cheapest_flights_df = flights_from_city.sort("Price_in_EUR").head(5)
 
         cheapest_flights = []
@@ -207,7 +195,6 @@ async def get_cheapest_flights_per_route(origin: str, destination: str):
         if df is None:
             raise HTTPException(status_code=500, detail="Data not loaded")
 
-        # Get city info
         origin_city = loader.get_city(origin)
         dest_city = loader.get_city(destination)
 
@@ -223,7 +210,6 @@ async def get_cheapest_flights_per_route(origin: str, destination: str):
                 detail=f"Destination city '{destination}' not found or not geocoded",
             )
 
-        # Filter flights for this specific route
         route_flights = df.filter(
             (pl.col("Origin") == origin) & (pl.col("Destination") == destination)
         )
@@ -236,7 +222,6 @@ async def get_cheapest_flights_per_route(origin: str, destination: str):
 
         total_flights = len(route_flights)
 
-        # Get top 10 cheapest flights
         cheapest_flights_df = route_flights.sort("Price_in_EUR").head(10)
 
         cheapest_flights = []
