@@ -58,9 +58,13 @@ def compute_statistics(
     # Apply date filters if provided
     filtered_df = df
     if start_date:
-        filtered_df = filtered_df.filter(pl.col("Date") >= start_date)
+        filtered_df = filtered_df.filter(
+            pl.col("Date") >= pl.lit(start_date).str.to_date()
+        )
     if end_date:
-        filtered_df = filtered_df.filter(pl.col("Date") <= end_date)
+        filtered_df = filtered_df.filter(
+            pl.col("Date") <= pl.lit(end_date).str.to_date()
+        )
 
     if len(filtered_df) == 0:
         raise ValueError("No flights found in the specified date range")
