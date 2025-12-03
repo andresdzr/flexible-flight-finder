@@ -9,6 +9,7 @@ import {
   TrendingDown,
   Calendar,
   PieChart,
+  PlaneTakeoff,
 } from "lucide-react";
 import { FlightFinder } from "@/components/FlightFinder";
 
@@ -163,14 +164,13 @@ export default function MainScreen() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
           <Card className="p-6 text-center">
             <div className="inline-flex p-3 bg-green-100 dark:bg-green-900 rounded-lg mb-4">
-              <TrendingDown className="w-6 h-6 text-green-600 dark:text-green-400" />
+              <PlaneTakeoff className="w-6 h-6 text-green-600 dark:text-green-400" />
             </div>
             <h4 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
-              Best Price Guarantee
+              Trip inspiration
             </h4>
             <p className="text-gray-600 dark:text-gray-400 text-sm">
-              Find the absolute cheapest flights with our comprehensive price
-              analysis and comparison tools.
+              Find cheap flights and trips with our comprehensive models.
             </p>
           </Card>
 
