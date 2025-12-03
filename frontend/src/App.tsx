@@ -4,6 +4,7 @@ import { MapScreen } from "@/screens/MapScreen";
 import MainScreen from "@/screens/MainScreen";
 import StatsScreen from "@/screens/StatsScreen";
 import FlightResultsScreen from "@/screens/FlightResultsScreen";
+import ClassificationScreen from "@/screens/ClassificationScreen";
 import "./App.css";
 
 function App() {
@@ -15,6 +16,7 @@ function App() {
           <Route path="/map" element={<MapScreen />} />
           <Route path="/stats" element={<StatsScreen />} />
           <Route path="/results" element={<FlightResultsScreen />} />
+          <Route path="/classification" element={<ClassificationScreen />} />
         </Routes>
       </BrowserRouter>
     </ThemeProvider>

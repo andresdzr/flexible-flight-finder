@@ -31,29 +31,29 @@
         "Milan"
     ],
     "louvain_community_1": [
-        "Copenhagen",
-        "Brussels",
         "Budapest",
-        "Amsterdam",
-        "Milan",
-        "Zurich",
-        "Athens",
         "Prague",
-        "Stockholm",
+        "Athens",
         "Madrid",
-        "Lisbon"
+        "Stockholm",
+        "Brussels",
+        "Amsterdam",
+        "Lisbon",
+        "Zurich",
+        "Milan",
+        "Copenhagen"
     ],
     "louvain_community_2": [
-        "Istanbul",
+        "Vienna",
         "London",
-        "Berlin",
-        "Paris",
-        "Dublin",
-        "Oslo",
-        "Helsinki",
         "Bucharest",
+        "Dublin",
+        "Helsinki",
+        "Paris",
         "Rome",
-        "Vienna"
+        "Istanbul",
+        "Oslo",
+        "Berlin"
     ],
     "budget_hubs": [
         "Milan",

@@ -75,6 +75,8 @@
   --chart-3: hsl(142 71% 45%);
   --chart-4: hsl(38 92% 50%);
   --chart-5: hsl(340 82% 52%);
+  --tooltip-bg: #ffffff;
+  --tooltip-text: #333333;
 }
 
 .dark {
@@ -109,6 +111,8 @@
   --chart-3: hsl(142 71% 55%);
   --chart-4: hsl(38 92% 60%);
   --chart-5: hsl(340 82% 62%);
+  --tooltip-bg: hsl(240 10% 7%);
+  --tooltip-text: hsl(0 0% 98%);
 }
 
 @layer base {
