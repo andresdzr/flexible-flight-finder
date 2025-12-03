@@ -21,8 +21,6 @@ export default function FlightResultsScreen() {
   const origin = searchParams.get("origin");
   const minDays = searchParams.get("minDays");
   const maxDays = searchParams.get("maxDays");
-  const startMonth = searchParams.get("startMonth");
-  const endMonth = searchParams.get("endMonth");
   const startDate = searchParams.get("startDate");
   const endDate = searchParams.get("endDate");
   const maxPrice = searchParams.get("maxPrice");
@@ -60,8 +58,6 @@ export default function FlightResultsScreen() {
           const params = new URLSearchParams();
           if (minDays) params.append("min_days", minDays);
           if (maxDays) params.append("max_days", maxDays);
-          if (startMonth) params.append("start_month", startMonth);
-          if (endMonth) params.append("end_month", endMonth);
           if (startDate) params.append("start_date", startDate);
           if (endDate) params.append("end_date", endDate);
           if (maxPrice) params.append("max_price", maxPrice);
@@ -86,8 +82,6 @@ export default function FlightResultsScreen() {
   }, [
     minDays,
     maxDays,
-    startMonth,
-    endMonth,
     startDate,
     endDate,
     maxPrice,
@@ -163,9 +157,7 @@ export default function FlightResultsScreen() {
               <div className="flex items-center gap-2">
                 <Calendar className="w-4 h-4 text-blue-500" />
                 <span>
-                  {startDate && endDate
-                    ? `${startDate} - ${endDate}`
-                    : `${startMonth || ""} - ${endMonth || ""}`}
+                  {`${startDate} - ${endDate}`}
                 </span>
               </div>
               {!oneWay && (
@@ -488,17 +480,17 @@ export default function FlightResultsScreen() {
                             {flight.price_trend === "falling" ? (
                               <>
                                 <TrendingDown className="w-3 h-3" />
-                                <span>Price expected to fall the next 7 days</span>
+                                <span>Price expected to fall in the next 7 days</span>
                               </>
                             ) : flight.price_trend === "rising" ? (
                               <>
                                 <TrendingUp className="w-3 h-3" />
-                                <span>Price expected to rise the next 7 days</span>
+                                <span>Price expected to rise in the next 7 days</span>
                               </>
                             ) : (
                               <>
                                 <Minus className="w-3 h-3" />
-                                <span>Price expected to be stable the next 7 days</span>
+                                <span>Price expected to be stable in the next 7 days</span>
                               </>
                             )}
                           </div>

@@ -7,7 +7,6 @@ from app.search_schemas import (
     MulticityLeg,
 )
 from app.price_predictor_service import price_predictor
-import random
 from typing import Optional
 from datetime import date
 import os
@@ -20,8 +19,6 @@ async def search_flights(
     origin: Optional[str] = Query(None),
     min_days: Optional[int] = Query(None),
     max_days: Optional[int] = Query(None),
-    start_month: Optional[str] = Query(None),
-    end_month: Optional[str] = Query(None),
     start_date: Optional[str] = Query(None),
     end_date: Optional[str] = Query(None),
     max_price: Optional[float] = Query(None),
@@ -29,59 +26,17 @@ async def search_flights(
     one_way: Optional[bool] = Query(False),
 ):
     """
-    Search for flights using Amadeus API with fallback to mock data.
+    Search for flights using Amadeus API.
     """
     from app.amadeus_client import amadeus_client
     from app.airport_service import airport_service
-    from datetime import datetime, timedelta
-    import calendar
+    from datetime import datetime
 
-    # Helper to convert month name to date range
-    def get_date_range(start_month_name, end_month_name):
-        try:
-            month_map = {name: i for i, name in enumerate(calendar.month_name) if name}
-            start_month_idx = month_map.get(start_month_name.capitalize())
-            end_month_idx = month_map.get(end_month_name.capitalize())
-
-            if not start_month_idx or not end_month_idx:
-                return None
-
-            current_year = datetime.now().year
-            # If start month is earlier than current month, assume next year
-            # For simplicity, let's just use current year + 1 if month < current month, else current year
-            # But user said "2025-12-10,2025-12-30" in example.
-            # Let's try to construct a valid range.
-
-            # Simple logic: Start from 1st of start_month to end of end_month
-            # Year logic: if month is in past relative to now, use next year.
-
-            now = datetime.now()
-            start_year = now.year
-            if start_month_idx < now.month:
-                start_year += 1
-
-            end_year = start_year
-            if end_month_idx < start_month_idx:
-                end_year += 1
-
-            start_date_str = f"{start_year}-{start_month_idx:02d}-01"
-
-            # Get last day of end month
-            last_day = calendar.monthrange(end_year, end_month_idx)[1]
-            end_date_str = f"{end_year}-{end_month_idx:02d}-{last_day:02d}"
-
-            return f"{start_date_str},{end_date_str}"
-        except Exception:
-            return None
-
-    # Try Amadeus API first
-    amadeus_results = []  # Initialize amadeus_results here
+    amadeus_results = []
 
     date_range = None
     if start_date and end_date:
         date_range = f"{start_date},{end_date}"
-    elif start_month and end_month:
-        date_range = get_date_range(start_month, end_month)
 
     if date_range:
         # Duration is only valid for round trips in Amadeus Flight Inspiration Search
@@ -95,7 +50,7 @@ async def search_flights(
             [origin] if origin else ["MAD"]
         )  # Default to MAD for API call if not provided
 
-        # If origin is likely a city name (longer than 3 chars), try to resolve it
+        # try to resolve city names
         if origin and len(origin) > 3:
             resolved_origins = airport_service.get_iata_codes_by_city(origin)
             if resolved_origins:
@@ -176,9 +131,6 @@ async def search_flights(
                                 "return_date": return_date_str
                             }
 
-                            # predicted_price = price_predictor.predict_price(flight_data_for_pred)
-                            # is_superdeal, savings = price_predictor.check_superdeal(price_total, predicted_price)
-                            
                             trend = price_predictor.predict_trend(flight_data_for_pred, price_total)
 
                             flight = FlightDetail(
@@ -200,11 +152,6 @@ async def search_flights(
                             )
 
                             flight_dict = flight.model_dump()
-                            flight_dict["airline"] = "Amadeus Found"  # Placeholder
-                            flight_dict["duration"] = "N/A"
-                            flight_dict["stops"] = "Non-stop" if non_stop else "Unknown"
-                            flight_dict["departure"] = "10:00"  # Mock
-                            flight_dict["arrival"] = "12:00"  # Mock
 
                             amadeus_results.append(flight_dict)
                         except Exception as e:
