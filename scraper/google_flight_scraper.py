@@ -136,7 +136,7 @@ def scrape_route(driver, origin, destination, months, output_file):
                         )
                         price_value = price_element.text.strip()
                     except:
-                        # Fallback text parsing
+                        # alternative if google changes structure
                         for line in price_text:
                             if (
                                 "€" in line
@@ -173,7 +173,7 @@ def scrape_route(driver, origin, destination, months, output_file):
             df["Date"] = pd.to_datetime(df["Date"])
             df = df.sort_values(by="Date")
 
-            # Check if file exists to determine if we need a header
+            # add header potentially
             file_exists = os.path.isfile(output_file)
             df.to_csv(output_file, mode="a", header=not file_exists, index=False)
             print(f"Saved {len(df)} prices for {origin}->{destination}")

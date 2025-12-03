@@ -45,7 +45,7 @@ CITY_TO_IATA_MAPPING = {
     "Istanbul": "IST",
 }
 
-# Define the date the data was scraped to calculate "Days Until Departure"
+# static scrape date for days until departure calculation
 SCRAPE_DATE = datetime.datetime(2025, 12, 2)
 
 def main(input_file: str, output_file: str):
@@ -55,19 +55,17 @@ def main(input_file: str, output_file: str):
     df = pd.read_csv(input_file)
 
     print("Cleaning Price column...")
-    # Remove currency symbols (€, $, £) and commas, convert to float
+    # Remove currency symbols 
     df['Price'] = df['Price'].astype(str).str.replace(r'[^\d.]', '', regex=True)
     df['Price'] = pd.to_numeric(df['Price'], errors='coerce')
     
-    # Remove rows where price conversion failed
+    # drop rows where price conversion failed
     initial_len = len(df)
     df = df.dropna(subset=['Price'])
     if initial_len != len(df):
         print(f"Dropped {initial_len - len(df)} rows with invalid prices.")
         
     df = df.rename(columns={"Price": "Price_in_EUR"})
-
-    print("Mapping Cities to IATA, Coordinates, and Countries...")
 
     # Helper function to look up data
     def get_route_details(row):
@@ -79,22 +77,21 @@ def main(input_file: str, output_file: str):
         dest_iata = CITY_TO_IATA_MAPPING.get(dest_city)
         
         # 2. Get details from airportsdata library
-        # Default values if not found
         o_lat, o_lon, o_country = None, None, "Unknown"
         d_lat, d_lon, d_country = None, None, "Unknown"
         distance = None
 
-        # Look up Origin
+        # Origin
         if origin_iata and origin_iata in airports:
             o_data = airports[origin_iata]
             o_lat, o_lon = o_data['lat'], o_data['lon']
-            o_country = o_data['country'] # Dynamically mapped!
+            o_country = o_data['country']
         
-        # Look up Destination
+        # Destination
         if dest_iata and dest_iata in airports:
             d_data = airports[dest_iata]
             d_lat, d_lon = d_data['lat'], d_data['lon']
-            d_country = d_data['country'] # Dynamically mapped!
+            d_country = d_data['country']
 
         # 3. Calculate Geodesic Distance if we have both coordinates
         if o_lat and d_lat:
@@ -106,7 +103,7 @@ def main(input_file: str, output_file: str):
             distance
         ])
 
-    # Apply the function to the dataframe
+    # Apply the function to the dataframe, pandas magic
     new_columns = [
         'Origin', 'Origin_Lat', 'Origin_Lon', 'Origin_Country',
         'Destination', 'Destination_Lat', 'Destination_Lon', 'Destination_Country',
@@ -115,11 +112,9 @@ def main(input_file: str, output_file: str):
     
     df[new_columns] = df.apply(get_route_details, axis=1)
 
-    # Remove rows where we couldn't map the city (Distance is NaN)
-    # This cleans up cities that might not be in our mapping dict
+    # drop rows with error in calculating distance
     missing_data_count = df['Distance_km'].isna().sum()
     if missing_data_count > 0:
-        print(f"   ⚠️ Warning: Could not calculate distance for {missing_data_count} flights (City not in mapping). Dropping them.")
         df = df.dropna(subset=['Distance_km'])
 
     print("Splitting Dates...")
@@ -128,13 +123,12 @@ def main(input_file: str, output_file: str):
     df['Year'] = df['Date'].dt.year
     df['Month'] = df['Date'].dt.month
     df['Day'] = df['Date'].dt.day
-    df['Weekday'] = df['Date'].dt.day_name() # e.g., "Monday", "Tuesday"
+    df['Weekday'] = df['Date'].dt.day_name()
     
-    # Calculate days left (ensure you have a logical SCRAPE_DATE)
     df['Days_until_departure'] = (df['Date'] - SCRAPE_DATE).dt.days
 
     df.to_csv(output_file, index=False)
-    print(f"🎉 Success! Enriched data saved to {output_file}")
+    print(f"Success! Enriched data saved to {output_file}")
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Enriches a flight price CSV using IATA codes and dynamic airport data.")
