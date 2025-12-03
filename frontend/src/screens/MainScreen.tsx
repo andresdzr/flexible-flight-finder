@@ -6,10 +6,10 @@ import {
   Map,
   BarChart3,
   ArrowRight,
-  TrendingDown,
   Calendar,
   PieChart,
   PlaneTakeoff,
+  Network,
 } from "lucide-react";
 import { FlightFinder } from "@/components/FlightFinder";
 
@@ -52,7 +52,7 @@ export default function MainScreen() {
         <FlightFinder />
 
         {/* Main Navigation Cards */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-12">
           {/* Map Explorer Card */}
           <Link to="/map" className="group">
             <Card className="p-8 h-full hover:shadow-xl transition-all duration-300 hover:-translate-y-1 border-2 border-transparent hover:border-blue-500 dark:hover:border-blue-400">
@@ -153,6 +153,59 @@ export default function MainScreen() {
                   </span>
                   <span className="px-3 py-1 bg-gray-100 dark:bg-gray-800 rounded-full text-xs font-medium text-gray-700 dark:text-gray-300">
                     Analytics
+                  </span>
+                </div>
+              </div>
+            </Card>
+          </Link>
+
+          {/* Classification Card */}
+          <Link to="/classification" className="group">
+            <Card className="p-8 h-full hover:shadow-xl transition-all duration-300 hover:-translate-y-1 border-2 border-transparent hover:border-green-500 dark:hover:border-green-400">
+              <div className="flex items-start gap-4 mb-4">
+                <div className="p-3 bg-green-100 dark:bg-green-900 rounded-lg group-hover:scale-110 transition-transform">
+                  <Network className="w-8 h-8 text-green-600 dark:text-green-400" />
+                </div>
+                <div className="flex-1">
+                  <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-2 flex items-center gap-2">
+                    City Classification
+                    <ArrowRight className="w-5 h-5 opacity-0 group-hover:opacity-100 transition-opacity" />
+                  </h3>
+                  <p className="text-gray-600 dark:text-gray-400">
+                    Explore clustering patterns across European cities
+                  </p>
+                </div>
+              </div>
+
+              <div className="space-y-3 mb-6">
+                <div className="flex items-center gap-3 text-gray-700 dark:text-gray-300">
+                  <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                  <span>Geographical distance-based clusters</span>
+                </div>
+                <div className="flex items-center gap-3 text-gray-700 dark:text-gray-300">
+                  <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                  <span>Network community detection</span>
+                </div>
+                <div className="flex items-center gap-3 text-gray-700 dark:text-gray-300">
+                  <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                  <span>Budget hub centrality analysis</span>
+                </div>
+                <div className="flex items-center gap-3 text-gray-700 dark:text-gray-300">
+                  <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                  <span>ML-based hybrid clustering</span>
+                </div>
+              </div>
+
+              <div className="flex items-center justify-between pt-4 border-t border-gray-200 dark:border-gray-700">
+                <span className="text-sm font-semibold text-green-600 dark:text-green-400">
+                  Explore Patterns →
+                </span>
+                <div className="flex gap-2">
+                  <span className="px-3 py-1 bg-gray-100 dark:bg-gray-800 rounded-full text-xs font-medium text-gray-700 dark:text-gray-300">
+                    ML
+                  </span>
+                  <span className="px-3 py-1 bg-gray-100 dark:bg-gray-800 rounded-full text-xs font-medium text-gray-700 dark:text-gray-300">
+                    Clustering
                   </span>
                 </div>
               </div>
