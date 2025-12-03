@@ -7,9 +7,6 @@ import pyomo.environ as pyo
 from collections import defaultdict
 
 
-# ============================================================
-#                     DATA UTILITIES
-# ============================================================
 def days_in_range(start_date: date, end_date: date) -> List[date]:
     """
     Returns a list of all days between start_date and end_date (inclusive).
@@ -91,9 +88,6 @@ def get_all_cities_from_monthly_costs(monthly_costs):
     return sorted(cities)
 
 
-# ============================================================
-#                      OPTIMIZER
-# ============================================================
 def optimizer(
     start_date: date,
     end_date: date,
@@ -125,16 +119,12 @@ def optimizer(
 
     monthly_costs = build_monthly_costs_from_csv(csv_path)
 
-    # Determine reference month = month of the start_date
     mref = (start_date.year, start_date.month)
     if mref not in monthly_costs:
         raise KeyError(f"No hay datos de precios para el mes de salida {mref}")
 
     costs_ref = monthly_costs[mref]  # dict (i,j)->price
 
-    # --------------------------------
-    # List all cities
-    # --------------------------------
     all_cities = get_all_cities_from_monthly_costs(monthly_costs)
     all_cities = [str(c).strip() for c in all_cities if str(c).strip() != ""]
     origin = str(origin).strip()
@@ -144,15 +134,10 @@ def optimizer(
             f"La ciudad origin '{origin}' no aparece en los datos de vuelos. Ejemplos: {all_cities[:10]}"
         )
 
-    # Allowed cities = all except origin (unless filtered by results.json)
     allowed_city_set = set(all_cities)
     if origin in allowed_city_set:
         allowed_city_set.remove(origin)
 
-    # --------------------------------
-    # Optional city type filtering via results.json
-    # --------------------------------
-    # Try multiple locations for results.json
     possible_results_paths = [
         os.path.join(os.getcwd(), "results.json"),
         os.path.join(os.getcwd(), "data", "results.json"),
@@ -192,14 +177,12 @@ def optimizer(
 
     allowed_cities = sorted(list(allowed_city_set))
 
-    # --------------------------------
-    # Build day list and month list
-    # --------------------------------
+    # build day list and month list
     day_list = days_in_range(start_date, end_date)
     D = len(day_list)
     if D <= 0:
         raise ValueError("Rango de fechas inválido")
-    # For each (year,month), store the first and last day indices available in the trip
+    # for each (year,month), store the first and last day indices available in the trip
     month_day_ranges = {}
     for off, dt in enumerate(day_list):
         ym = (dt.year, dt.month)
@@ -209,7 +192,7 @@ def optimizer(
             month_day_ranges[ym][1] = off
     months_in_trip = sorted(list(month_day_ranges.keys()))
 
-    # Validate that all needed months exist in monthly_costs
+    # validate that all needed months exist in monthly_costs
     for m in months_in_trip:
         if m not in monthly_costs:
             raise KeyError(f"Missing prices for month {m} in CSV '{csv_path}'")
@@ -217,9 +200,7 @@ def optimizer(
     # construir nodes = origin + allowed_cities (normalizados)
     nodes = sorted(set([origin] + [str(c).strip() for c in allowed_cities]))
 
-    # --------------------------------
-    # Build node and arc sets
-    # --------------------------------
+    # build node and arc sets
     arc_set = set()
     for m in months_in_trip:
         mp = monthly_costs.get(m, {})
@@ -227,7 +208,7 @@ def optimizer(
             try:
                 i_raw, j_raw = key
             except Exception:
-                # Robust fallback if CSV formatting is odd
+                # fallback if CSV formatting is odd
                 s = str(key)
                 parts = [p.strip() for p in s.split(",")]
                 if len(parts) >= 2:
@@ -241,7 +222,7 @@ def optimizer(
             if i in nodes and j in nodes and i != j:
                 arc_set.add((i, j))
 
-    # Ensure symmetry of arcs
+    # ensure symmetry of arcs
     for i, j in list(arc_set):
         arc_set.add((j, i))
 
@@ -251,7 +232,6 @@ def optimizer(
             "No se encontraron arcos válidos dentro de los meses del viaje y nodes seleccionados."
         )
 
-    # Prepare diagnostic info
     prepared = {
         "month_ref": mref,
         "nodes": nodes,
@@ -263,20 +243,14 @@ def optimizer(
         "origin": origin,
     }
 
-    # ============================================================
-    #                     MODEL DEFINITION (Pyomo)
-    # ============================================================
+    # MODEL DEFINITION (Pyomo)
 
     model = pyo.ConcreteModel()
 
-    # Sets
+    # sets
     model.C = pyo.Set(initialize=nodes)
     model.A = pyo.Set(initialize=arcs)
     model.M = pyo.Set(initialize=months_in_trip)
-
-    # ----------------------------------------------------
-    # Decision variables
-    # ----------------------------------------------------
 
     # x[i,j] = 1 if flight i->j is taken
     model.x = pyo.Var(model.A, within=pyo.Binary)
@@ -291,9 +265,7 @@ def optimizer(
     M_big = D + 1
     model.t = pyo.Var(model.C, within=pyo.Integers, bounds=(-M_big, D))
 
-    # ----------------------------------------------------
     # z[i,j,m] indicates that arc (i,j) is chosen in month m
-    # ----------------------------------------------------
 
     # Build z_index where monthly_costs is defined
     z_index = []
@@ -308,15 +280,11 @@ def optimizer(
 
     model.z = pyo.Var(z_index, within=pyo.Binary)
 
-    # ----------------------------------------------------
-    # Objective: maximize number of visited cities
-    # ----------------------------------------------------
+    # objective: maximize number of visited cities
 
     model.obj = pyo.Objective(expr=sum(model.y[c] for c in model.C), sense=pyo.maximize)
 
-    # ============================================================
-    #                     FLOW CONSTRAINTS
-    # ============================================================
+    # FLOW CONSTRAINTS
 
     model.flow_in = pyo.ConstraintList()
     model.flow_out = pyo.ConstraintList()
@@ -324,13 +292,13 @@ def optimizer(
         inc = [model.x[i, j] for i in nodes if (i, j) in arcs]
         out = [model.x[j, k] for k in nodes if (j, k) in arcs]
 
-        # If y[j] = 1, exactly one incoming arc must be chosen
+        # if y[j] = 1, exactly one incoming arc must be chosen
         model.flow_in.add(sum(inc) == model.y[j])
 
-        # If y[j] = 1, exactly one outgoing arc must be chosen
+        # if y[j] = 1, exactly one outgoing arc must be chosen
         model.flow_out.add(sum(out) == model.y[j])
 
-    # Ensure exactly one departure and one return at origin (start and end)
+    # ensure exactly one departure and one return at origin (start and end)
     outs = [model.x[origin, j] for j in nodes if (origin, j) in arcs]
     ins = [model.x[i, origin] for i in nodes if (i, origin) in arcs]
 
@@ -342,9 +310,7 @@ def optimizer(
     model.origin_out = pyo.Constraint(expr=sum(outs) == 1)
     model.origin_in = pyo.Constraint(expr=sum(ins) == 1)
 
-    # ============================================================
-    #                    BUDGET CONSTRAINT
-    # ============================================================
+    # BUDGET CONSTRAINT
 
     def budget_rule(m):
         """
@@ -360,9 +326,7 @@ def optimizer(
 
     model.budget_constraint = pyo.Constraint(rule=budget_rule)
 
-    # ============================================================
-    #              MINIMUM DAYS + TOTAL DAYS LIMIT
-    # ============================================================
+    # MINIMUM DAYS + TOTAL DAYS LIMIT
 
     min_days = prepared.get("min_days_per_city", min_days_per_city)
 
@@ -370,16 +334,14 @@ def optimizer(
 
     for c in nodes:
         if c == origin:
-            # Does not apply to origin city
+            # does not apply to origin city
             continue
         model.min_days.add(model.d[c] >= min_days * model.y[c])
 
-    # Total days cannot exceed the trip duration
+    # total days cannot exceed the trip duration
     model.total_days = pyo.Constraint(expr=sum(model.d[c] for c in nodes) <= D)
 
-    # ============================================================
-    #      MTZ SUBTOUR ELIMINATION + TIME ACTIVATION CONSTRAINTS
-    # ============================================================
+    # MTZ SUBTOUR ELIMINATION + TIME ACTIVATION CONSTRAINTS
 
     # These constraints control the "time" variable t[i], which assigns an
     # ordering to visited cities so that subtours (small cycles not including origin)
@@ -388,15 +350,8 @@ def optimizer(
     model.t_active = pyo.ConstraintList()
 
     for i in nodes:
-        # (A) Upper bound activation: t[i] <= D * y[i]
-        # If the city is NOT visited (y[i] = 0):
-        #     t[i] <= 0       (since right side is D*0 = 0)
-        #     → This keeps t[i] at 0 or negative values.
-        #
-        # If the city IS visited (y[i] = 1):
-        #     t[i] <= D       (right side becomes D*1 = D)
-        #     → This makes time assignment "active", allowing t[i] to range
-        #       within the valid trip horizon [1..D].
+        # (A) If city is visited (y[i]=1): t[i] <= D
+        #     If not visited (y[i]=0): t[i] <= 0
         model.t_active.add(model.t[i] <= D * model.y[i])
 
         # (B) Lower bound activation: t[i] >= 2 * y[i] - 1
@@ -406,51 +361,42 @@ def optimizer(
             model.t[i] >= 2 * model.y[i] - 1
         )  # Usamos 1 como tiempo de inicio
 
-    # -----------------------------------------------------------
     # (C) Force the origin city to have time = 1
-    # -----------------------------------------------------------
-    # This anchors the MTZ ordering. Without this the system could arbitrarily shift all t[i]'s.
+    # this anchors the MTZ ordering, without this the system could arbitrarily shift all t[i]'s
     model.t_origin = pyo.Constraint(expr=model.t[origin] == 1)
 
-    # ============================================================
-    #                MTZ SEQUENTIAL ORDERING CONSTRAINTS
-    # ============================================================
+    # MTZ SEQUENTIAL ORDERING CONSTRAINTS
     model.time_link = pyo.ConstraintList()
     M_mtz = D
 
     for i, j in arcs:
-        # We do NOT apply MTZ to arcs that return to origin.
+        # we do NOT apply MTZ to arcs that return to origin.
         if j != origin:
-            # If x[i,j]=1, then t[j] >= t[i] + 1
-            # If x[i,j]=0, restriction becomes irrelevant because M_mtz is large enough to make
-            # the inequality always true
+            # if x[i,j]=1, then t[j] >= t[i] + 1
+            # if x[i,j]=0, restriction becomes irrelevant because M_mtz is large enough to make the inequality always true
             model.time_link.add(
                 model.t[j] >= model.t[i] + 1 - M_mtz * (1 - model.x[(i, j)])
             )
         else:
             # MTZ rule is *not* applied for arcs returning to origin.
-            # imposing MTZ structure here would require t[origin] > t[i], which contradicts t[origin] = 1.
+            # imposing MTZ structure here would require t[origin] > t[i], which goes against t[origin] = 1.
             pass
 
-    # ============================================================
-    #               Z LINKING (month selection)
-    # ============================================================
+    # Z LINKING (month selection)
     model.z_link = pyo.ConstraintList()
     for i, j in arcs:
         months_for_arc = [
             m for m in months_in_trip if (i, j) in monthly_costs.get(m, {})
         ]
         if months_for_arc:
-            # Exactly one month must be chosen when arc (i,j) is taken
+            # exactly one month must be chosen when arc (i,j) is taken
             model.z_link.add(
                 sum(model.z[(i, j, m)] for m in months_for_arc) == model.x[i, j]
             )
         else:
             model.z_link.add(model.x[i, j] == 0)
 
-    # ============================================================
-    #          TIME WINDOW FOR EACH MONTH (z -> t)
-    # ============================================================
+    # TIME WINDOW FOR EACH MONTH (z -> t)
     model.z_time = pyo.ConstraintList()
     for i, j, m in z_index:
         a_offset, b_offset = month_day_ranges[m]  # offsets relativos al start_date
@@ -458,9 +404,7 @@ def optimizer(
         model.z_time.add(model.t[i] >= a_offset - M_big * (1 - model.z[(i, j, m)]))
         model.z_time.add(model.t[i] <= b_offset + M_big * (1 - model.z[(i, j, m)]))
 
-    # ============================================================
-    #                          SOLVE
-    # ============================================================
+    # SOLVE MODEL
     solver = pyo.SolverFactory(solver_name)
     res = solver.solve(model, tee=verbose)
 
@@ -474,18 +418,15 @@ def optimizer(
         "model": model,
     }
 
-    # ============================================================
-    #               EXTRACT RESULTS IF FEASIBLE
-    # ============================================================
+    # EXTRACT RESULTS IF FEASIBLE
 
     if term in ("optimal", "feasible"):
         # recoger variables
         visited = [c for c in nodes if pyo.value(model.y[c]) > 0.5]
         flights = [(i, j) for (i, j) in arcs if pyo.value(model.x[(i, j)]) > 0.5]
-        # Sort flights by departure city time t[i]
+        # sort flights by departure city time t[i]
         flights_sorted = sorted(flights, key=lambda pair: pyo.value(model.t[pair[0]]))
 
-        # Calculating total Costs
         total_cost = 0.0
         cost_by_month = defaultdict(float)
         cost_by_flight = defaultdict(float)
@@ -500,7 +441,7 @@ def optimizer(
             cost_by_month[mm] += line_cost
             cost_by_flight[(i, j)] += line_cost
 
-        # Sort cost_by_flight by departure time t[i] and round to 2 decimals
+        # sort cost_by_flight by departure time t[i] and round to 2 decimals
         cost_by_flight_sorted = {
             (i, j): round(cost_by_flight[(i, j)], 2)
             for (i, j) in sorted(

@@ -12,7 +12,7 @@ export function FlightFinder() {
   const [maxDays, setMaxDays] = useState(7);
   const [startDate, setStartDate] = useState("2025-12-30");
   const [endDate, setEndDate] = useState("2026-03-15");
-  const [maxPrice, setMaxPrice] = useState(200);
+  const [maxPrice, setMaxPrice] = useState(400);
   const [nonStop, setNonStop] = useState(false);
   const [oneWay, setOneWay] = useState(false);
   const [multicity, setMulticity] = useState(false);
@@ -188,8 +188,9 @@ export function FlightFinder() {
             {cityTypeKey && (
               <p className="text-xs text-gray-500 dark:text-gray-400">
                 Limiting search to:{" "}
-                {(classificationData as any)[cityTypeKey]?.join(", ") ||
-                  "Unknown"}
+                {(classificationData as unknown as Record<string, string[]>)[
+                  cityTypeKey
+                ]?.join(", ") || "Unknown"}
               </p>
             )}
           </div>

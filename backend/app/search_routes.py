@@ -128,10 +128,12 @@ async def search_flights(
                                 "origin_lon": origin_obj.coords.lon,
                                 "dest_lat": dest_obj.coords.lat,
                                 "dest_lon": dest_obj.coords.lon,
-                                "return_date": return_date_str
+                                "return_date": return_date_str,
                             }
 
-                            trend = price_predictor.predict_trend(flight_data_for_pred, price_total)
+                            trend = price_predictor.predict_trend(
+                                flight_data_for_pred, price_total
+                            )
 
                             flight = FlightDetail(
                                 origin=origin_obj,
@@ -148,7 +150,7 @@ async def search_flights(
                                 year=int(dept_date_str.split("-")[0]),
                                 month=int(dept_date_str.split("-")[1]),
                                 day=int(dept_date_str.split("-")[2]),
-                                price_trend=trend
+                                price_trend=trend,
                             )
 
                             flight_dict = flight.model_dump()
@@ -247,7 +249,6 @@ async def search_multicity_flights(
         total_cost = result.get("total_cost", 0.0)
         cost_by_flight = result.get("total_cost_by_flight", {})
 
-        # Build legs
         legs = []
         for orig, dest in flights:
             leg_cost = cost_by_flight.get((orig, dest), 0.0)

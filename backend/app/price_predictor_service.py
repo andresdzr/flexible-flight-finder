@@ -5,10 +5,10 @@ from typing import List, Dict, Any, Optional
 import pandas as pd
 import numpy as np
 
+
 class PricePredictorService:
     def __init__(self, model_dir: Optional[str] = None):
         if model_dir is None:
-            # Default to ../../model relative to this file
             base_dir = os.path.dirname(os.path.abspath(__file__))
             self.model_dir = os.path.join(base_dir, "../../model")
         else:
@@ -30,8 +30,7 @@ class PricePredictorService:
                 return
 
             self.model = joblib.load(model_path)
-            
-            # Try to load features from file, fallback to model attribute
+
             if os.path.exists(features_path):
                 self.model_features = joblib.load(features_path)
             elif hasattr(self.model, "feature_names_in_"):
@@ -56,7 +55,6 @@ class PricePredictorService:
             return None
 
         try:
-            # Prepare input dataframe
             input_data = {
                 "Date": [flight_data.get("date")],
                 "Distance_km": [flight_data.get("distance_km")],
@@ -71,7 +69,7 @@ class PricePredictorService:
 
             df = pd.DataFrame(input_data)
 
-            # One-hot encode like in model
+            # one-hot encode like in model
             df_encoded = pd.get_dummies(df, columns=["Weekday"])
 
             # Align columns with model features (thanks pandas)
@@ -104,19 +102,19 @@ class PricePredictorService:
             base_date_str = flight_data.get("date")
             return_date_str = flight_data.get("return_date")
             base_date = datetime.strptime(base_date_str, "%Y-%m-%d")
-            
+
             return_date = None
             if return_date_str:
                 return_date = datetime.strptime(return_date_str, "%Y-%m-%d")
 
             predictions = []
-            
+
             # Predict for next 7 days
             for i in range(1, 8):
                 # departure + i days
                 next_date = base_date + timedelta(days=i)
                 next_date_str = next_date.strftime("%Y-%m-%d")
-                
+
                 # Predict departure
                 outbound_data = flight_data.copy()
                 outbound_data["date"] = next_date_str
@@ -124,12 +122,12 @@ class PricePredictorService:
                 outbound_data["year"] = next_date.year
                 outbound_data["month"] = next_date.month
                 outbound_data["day"] = next_date.day
-                
+
                 current_days_until = outbound_data.get("days_until_departure", 0)
                 outbound_data["days_until_departure"] = current_days_until + i
 
                 pred_outbound = self.predict_price(outbound_data)
-                
+
                 if pred_outbound is None:
                     continue
 
@@ -139,25 +137,27 @@ class PricePredictorService:
                 if return_date:
                     next_return_date = return_date + timedelta(days=i)
                     next_return_date_str = next_return_date.strftime("%Y-%m-%d")
-                    
+
                     return_data = flight_data.copy()
                     # Swap origin/dest
                     return_data["origin_lat"] = flight_data.get("dest_lat")
                     return_data["origin_lon"] = flight_data.get("dest_lon")
                     return_data["dest_lat"] = flight_data.get("origin_lat")
                     return_data["dest_lon"] = flight_data.get("origin_lon")
-                    
+
                     return_data["date"] = next_return_date_str
                     return_data["weekday"] = next_return_date.strftime("%A")
                     return_data["year"] = next_return_date.year
                     return_data["month"] = next_return_date.month
                     return_data["day"] = next_return_date.day
-                    
+
                     trip_duration_days = (return_date - base_date).days
-                    return_data["days_until_departure"] = outbound_data["days_until_departure"] + trip_duration_days
+                    return_data["days_until_departure"] = (
+                        outbound_data["days_until_departure"] + trip_duration_days
+                    )
 
                     pred_return = self.predict_price(return_data)
-                    
+
                     if pred_return is not None:
                         total_pred += pred_return
                     else:
@@ -169,15 +169,15 @@ class PricePredictorService:
                 return "stable"
 
             avg_predicted_price = sum(predictions) / len(predictions)
-            
+
             # addition only needed because we don't have Amadeus Prod Key yet
-            if (return_date):
+            if return_date:
                 diff = avg_predicted_price - current_price + 100
             else:
                 diff = avg_predicted_price - current_price + 30
-            
+
             if diff > threshold:
-                return "rising" 
+                return "rising"
             elif diff < -threshold:
                 return "falling"
             else:
@@ -185,6 +185,7 @@ class PricePredictorService:
 
         except Exception as e:
             return "stable"
+
 
 # Singleton instance
 price_predictor = PricePredictorService()
