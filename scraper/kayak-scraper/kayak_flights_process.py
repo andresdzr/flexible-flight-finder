@@ -10,25 +10,20 @@ OUTPUT_FILE = 'kayak_data.csv'
 def process_flight_data():
     try:
         # Load airports data (IATA code as key)
-        # This prevents hardcoding by loading a global database of airports
         print("Loading airport database...")
         airports = airportsdata.load('IATA') 
     except ImportError:
         print("Error: Please install airportsdata: pip install airportsdata")
         return
 
-    # Load CSV (Using StringIO to simulate reading a file for this example)
-    # In production, replace `io.StringIO(CSV_DATA)` with `INPUT_FILE`
     try:
-        df = pd.read_csv(INPUT_FILE) # Uncomment this to read from actual file
-        # df = pd.read_csv(io.StringIO(CSV_DATA))
+        df = pd.read_csv(INPUT_FILE)
         print("Data loaded successfully.")
     except Exception as e:
         print(f"Error loading CSV: {e}")
         return
 
-    # --- 1. COORDINATES & GEOLOCATION ---
-    # We create a helper function to fetch coords based on IATA code
+    # helper function to fetch lat/lon
     def get_airport_info(iata_code):
         airport = airports.get(iata_code)
         if airport:
@@ -44,33 +39,28 @@ def process_flight_data():
     # Apply lookup for Destination
     df[['Destination_Lat', 'Destination_Lon']] = df['destino_iata'].apply(get_airport_info)
 
-    # --- 2. DATE PROCESSING ---
     print("Processing dates...")
     df['Date'] = pd.to_datetime(df['Date'])
     
-    # Extract date parts
+    # Extract date
     df['Year'] = df['Date'].dt.year
     df['Month'] = df['Date'].dt.month
     df['Day'] = df['Date'].dt.day
-    df['Weekday'] = df['Date'].dt.day_name() # Or dayofweek for number
+    df['Weekday'] = df['Date'].dt.day_name()
     
-    # Calculate Days until departure
+    # Calculate Days until departure (hardcoded)
     scrape_date = pd.to_datetime("2025-12-01")
     df['Days_until_departure'] = (df['Date'] - scrape_date).dt.days
-
-    # --- 3. COLUMN MAPPING & RENAMING ---
-    # We define the exact output columns requested
-    # Mapping: Source_Col -> Target_Col
     
     # Creating the new dataframe structure
     output_df = pd.DataFrame()
     
     output_df['Origin'] = df['origen_iata']
     output_df['Destination'] = df['destino_iata']
-    output_df['Date'] = df['Date'].dt.date # Keep it as date string/object
+    output_df['Date'] = df['Date'].dt.date 
     output_df['Price_in_€'] = df['precio']
     
-    # For Region, we use Country from input as it's the most reliable "Region" data provided
+    # No matter, won't be used
     output_df['Origin_Country'] = df['Origin_Country'] 
     output_df['Destination_Country'] = df['Dest_Country']
     
@@ -88,13 +78,11 @@ def process_flight_data():
     output_df['Weekday'] = df['Weekday']
     output_df['Days_until_departure'] = df['Days_until_departure']
 
-    # --- 4. EXPORT ---
     print(f"Exporting to {OUTPUT_FILE}...")
-    # round coords to 6 decimals for cleanliness, though not strictly required
     output_df = output_df.round({'Origin_Lat': 6, 'Origin_Lon': 6, 'Destination_Lat': 6, 'Destination_Lon': 6})
     
     output_df.to_csv(OUTPUT_FILE, index=False)
-    print("Done! Here is a preview:")
+    print("Preview:")
     print(output_df.head())
 
 if __name__ == "__main__":

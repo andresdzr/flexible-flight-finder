@@ -76,7 +76,7 @@ def setup_driver():
 
 
 def scrape_route(driver, origin, destination, months, output_file):
-    print(f"\n✈️  Processing Route: {origin} -> {destination}")
+    print(f"\nProcessing Route: {origin} -> {destination}")
     prices_map = {}
 
     try:
@@ -112,7 +112,7 @@ def scrape_route(driver, origin, destination, months, output_file):
             date_input.click()
             time.sleep(2)
         except Exception as e:
-            print("   ⚠️ Could not open calendar.")
+            print("Could not open calendar.")
             return
 
         # 4. Scrape X Months
@@ -147,17 +147,7 @@ def scrape_route(driver, origin, destination, months, output_file):
                                 price_value = line.strip()
                                 break
 
-                    if price_value:
-                        clean_price = (
-                            price_value.replace("€", "")
-                            .replace("$", "")
-                            .replace("£", "")
-                            .replace(",", "")
-                            .strip()
-                        )
-                        if clean_price.isdigit():
-                            # Store the ORIGINAL price_value (with currency)
-                            prices_map[iso_date] = price_value
+                    prices_map[iso_date] = price_value
 
                 except Exception:
                     continue
@@ -186,12 +176,12 @@ def scrape_route(driver, origin, destination, months, output_file):
             # Check if file exists to determine if we need a header
             file_exists = os.path.isfile(output_file)
             df.to_csv(output_file, mode="a", header=not file_exists, index=False)
-            print(f"   ✅ Saved {len(df)} prices for {origin}->{destination}")
+            print(f"Saved {len(df)} prices for {origin}->{destination}")
         else:
-            print(f"   ⚠️ No data found for {origin}->{destination}")
+            print(f"No data found for {origin}->{destination}")
 
     except Exception as e:
-        print(f"   ❌ Critical Error on route: {e}")
+        print(f"Critical Error on route: {e}")
 
 
 def main(months,output_file):
@@ -215,9 +205,9 @@ def main(months,output_file):
                 time.sleep(2)
 
     except KeyboardInterrupt:
-        print("\n🛑 Scrape interrupted by user.")
+        print("\nScrape interrupted by user.")
     finally:
-        print("🛑 Closing driver...")
+        print("Closing driver...")
         driver.quit()
 
 

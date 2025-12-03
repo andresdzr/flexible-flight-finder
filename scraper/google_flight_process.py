@@ -49,13 +49,12 @@ CITY_TO_IATA_MAPPING = {
 SCRAPE_DATE = datetime.datetime(2025, 12, 2)
 
 def main(input_file: str, output_file: str):
-    print("🌍 Loading Global Airport Database (airportsdata)...")
     airports = airportsdata.load('IATA') 
     
-    print(f"📂 Loading Input CSV: {input_file}...")
+    print(f"Loading Input CSV: {input_file}...")
     df = pd.read_csv(input_file)
 
-    print("🧹 Cleaning Price column...")
+    print("Cleaning Price column...")
     # Remove currency symbols (€, $, £) and commas, convert to float
     df['Price'] = df['Price'].astype(str).str.replace(r'[^\d.]', '', regex=True)
     df['Price'] = pd.to_numeric(df['Price'], errors='coerce')
@@ -64,11 +63,11 @@ def main(input_file: str, output_file: str):
     initial_len = len(df)
     df = df.dropna(subset=['Price'])
     if initial_len != len(df):
-        print(f"   ⚠️ Dropped {initial_len - len(df)} rows with invalid prices.")
+        print(f"Dropped {initial_len - len(df)} rows with invalid prices.")
         
     df = df.rename(columns={"Price": "Price_in_EUR"})
 
-    print("✈️  Mapping Cities to IATA, Coordinates, and Countries...")
+    print("Mapping Cities to IATA, Coordinates, and Countries...")
 
     # Helper function to look up data
     def get_route_details(row):
@@ -123,7 +122,7 @@ def main(input_file: str, output_file: str):
         print(f"   ⚠️ Warning: Could not calculate distance for {missing_data_count} flights (City not in mapping). Dropping them.")
         df = df.dropna(subset=['Distance_km'])
 
-    print("📅 Splitting Dates...")
+    print("Splitting Dates...")
     df['Date'] = pd.to_datetime(df['Date'])
     
     df['Year'] = df['Date'].dt.year
