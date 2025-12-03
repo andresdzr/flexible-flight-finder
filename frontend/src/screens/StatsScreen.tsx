@@ -273,8 +273,8 @@ export default function StatsScreen() {
                   },
                   tooltip: {
                     container: {
-                      background: "#ffffff",
-                      color: "#333333",
+                      background: "var(--tooltip-bg, #ffffff)",
+                      color: "var(--tooltip-text, #333333)",
                       fontSize: 12,
                       borderRadius: "4px",
                       boxShadow: "0 1px 2px rgba(0, 0, 0, 0.25)",
@@ -373,6 +373,16 @@ export default function StatsScreen() {
                       fill: "currentColor",
                     },
                   },
+                  tooltip: {
+                    container: {
+                      background: "var(--tooltip-bg, #ffffff)",
+                      color: "var(--tooltip-text, #333333)",
+                      fontSize: 12,
+                      borderRadius: "4px",
+                      boxShadow: "0 1px 2px rgba(0, 0, 0, 0.25)",
+                      padding: "5px 9px",
+                    },
+                  },
                 }}
               />
             </div>
@@ -467,6 +477,16 @@ export default function StatsScreen() {
                         fill: "currentColor",
                       },
                     },
+                    tooltip: {
+                      container: {
+                        background: "var(--tooltip-bg, #ffffff)",
+                        color: "var(--tooltip-text, #333333)",
+                        fontSize: 12,
+                        borderRadius: "4px",
+                        boxShadow: "0 1px 2px rgba(0, 0, 0, 0.25)",
+                        padding: "5px 9px",
+                      },
+                    },
                   }}
                 />
               </div>
@@ -502,10 +522,9 @@ export default function StatsScreen() {
                   }}
                   tooltip={({ datum }) => (
                     <div
+                      className="bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 border border-gray-300 dark:border-gray-600"
                       style={{
-                        background: "white",
                         padding: "9px 12px",
-                        border: "1px solid #ccc",
                         borderRadius: "4px",
                       }}
                     >
@@ -639,6 +658,16 @@ export default function StatsScreen() {
                   legends: {
                     text: {
                       fill: "currentColor",
+                    },
+                  },
+                  tooltip: {
+                    container: {
+                      background: "var(--tooltip-bg, #ffffff)",
+                      color: "var(--tooltip-text, #333333)",
+                      fontSize: 12,
+                      borderRadius: "4px",
+                      boxShadow: "0 1px 2px rgba(0, 0, 0, 0.25)",
+                      padding: "5px 9px",
                     },
                   },
                 }}

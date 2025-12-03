@@ -15,7 +15,6 @@ import {
 } from "lucide-react";
 import "leaflet/dist/leaflet.css";
 
-// City coordinates
 const CITY_COORDS: Record<string, [number, number]> = {
   Madrid: [40.4168, -3.7038],
   London: [51.5074, -0.1278],
@@ -40,7 +39,6 @@ const CITY_COORDS: Record<string, [number, number]> = {
   Milan: [45.4642, 9.19],
 };
 
-// Classification results from the notebook
 const CLASSIFICATION_DATA = {
   geographical: {
     western_europe: ["London", "Paris", "Amsterdam", "Brussels", "Dublin"],
@@ -117,7 +115,6 @@ const CLASSIFICATION_DATA = {
   },
 };
 
-// Color schemes for different classifications
 const GEOGRAPHICAL_COLORS: Record<string, string> = {
   western_europe: "#3b82f6",
   northern_europe: "#06b6d4",
