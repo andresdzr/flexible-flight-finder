@@ -40,7 +40,6 @@ export default function MainScreen() {
           </p>
         </div>
 
-        {/* Flight Finder */}
         <FlightFinder />
 
         {/* Main Navigation Cards */}

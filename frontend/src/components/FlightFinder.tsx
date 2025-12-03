@@ -1,8 +1,9 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Search, Calendar, Clock, Plane, Euro } from "lucide-react";
+import { Search, Calendar, Clock, Plane, Euro, MapPin } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { CityAutocomplete } from "@/components/CityAutocomplete";
+import classificationData from "@/assets/results.json";
 
 export function FlightFinder() {
   const navigate = useNavigate();
@@ -14,6 +15,8 @@ export function FlightFinder() {
   const [maxPrice, setMaxPrice] = useState(200);
   const [nonStop, setNonStop] = useState(false);
   const [oneWay, setOneWay] = useState(false);
+  const [multicity, setMulticity] = useState(false);
+  const [cityTypeKey, setCityTypeKey] = useState("");
 
   const today = new Date().toISOString().split("T")[0];
 
@@ -27,7 +30,11 @@ export function FlightFinder() {
       maxPrice: maxPrice.toString(),
       nonStop: nonStop.toString(),
       oneWay: oneWay.toString(),
+      multicity: multicity.toString(),
     });
+    if (multicity && cityTypeKey) {
+      params.append("cityTypeKey", cityTypeKey);
+    }
     navigate(`/results?${params.toString()}`);
   };
 
@@ -93,8 +100,9 @@ export function FlightFinder() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {/* Duration Range */}
           <div
-            className={`space-y-2 transition-opacity duration-200 ${oneWay ? "opacity-50" : ""
-              }`}
+            className={`space-y-2 transition-opacity duration-200 ${
+              oneWay ? "opacity-50" : ""
+            }`}
           >
             <label className="text-sm font-medium text-gray-700 dark:text-gray-300 flex items-center gap-2">
               <Clock className="w-4 h-4" />
@@ -140,6 +148,53 @@ export function FlightFinder() {
           </div>
         </div>
 
+        {/* City Type Filter (only visible for multi-city trips) */}
+        {multicity && (
+          <div className="space-y-2">
+            <label className="text-sm font-medium text-gray-700 dark:text-gray-300 flex items-center gap-2">
+              <MapPin className="w-4 h-4" />
+              Filter Cities (Optional)
+            </label>
+            <select
+              value={cityTypeKey}
+              onChange={(e) => setCityTypeKey(e.target.value)}
+              className="w-full p-2.5 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition-all cursor-pointer"
+            >
+              <option value="">All Cities</option>
+              <optgroup label="Geographical">
+                <option value="western_europe">Western Europe</option>
+                <option value="northern_europe">Northern Europe</option>
+                <option value="iberian_peninsula">Iberian Peninsula</option>
+                <option value="eastern_europe">Eastern Europe</option>
+                <option value="central_europe">Central Europe</option>
+              </optgroup>
+              <optgroup label="Network Communities">
+                <option value="louvain_community_1">Community 1</option>
+                <option value="louvain_community_2">Community 2</option>
+              </optgroup>
+              <optgroup label="Budget Hubs">
+                <option value="budget_hubs">Budget Hubs</option>
+              </optgroup>
+              <optgroup label="Hybrid Clusters">
+                <option value="cluster_0">
+                  Cluster 0 - High-Cost Peripheral
+                </option>
+                <option value="cluster_1">Cluster 1 - Major Hubs</option>
+                <option value="cluster_2">
+                  Cluster 2 - Balanced Connectors
+                </option>
+              </optgroup>
+            </select>
+            {cityTypeKey && (
+              <p className="text-xs text-gray-500 dark:text-gray-400">
+                Limiting search to:{" "}
+                {(classificationData as any)[cityTypeKey]?.join(", ") ||
+                  "Unknown"}
+              </p>
+            )}
+          </div>
+        )}
+
         {/* Options & Search */}
         <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-2">
           <div className="flex items-center gap-6">
@@ -148,7 +203,8 @@ export function FlightFinder() {
                 type="checkbox"
                 checked={nonStop}
                 onChange={(e) => setNonStop(e.target.checked)}
-                className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500 transition-all cursor-pointer"
+                disabled={multicity}
+                className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500 transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
               />
               <span className="text-sm font-medium text-gray-600 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-gray-200 transition-colors">
                 Non-stop only
@@ -159,10 +215,28 @@ export function FlightFinder() {
                 type="checkbox"
                 checked={oneWay}
                 onChange={(e) => setOneWay(e.target.checked)}
-                className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500 transition-all cursor-pointer"
+                disabled={multicity}
+                className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500 transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
               />
               <span className="text-sm font-medium text-gray-600 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-gray-200 transition-colors">
                 One way
+              </span>
+            </label>
+            <label className="flex items-center gap-2 cursor-pointer group">
+              <input
+                type="checkbox"
+                checked={multicity}
+                onChange={(e) => {
+                  setMulticity(e.target.checked);
+                  if (e.target.checked) {
+                    setNonStop(false);
+                    setOneWay(false);
+                  }
+                }}
+                className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500 transition-all cursor-pointer"
+              />
+              <span className="text-sm font-medium text-gray-600 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-gray-200 transition-colors">
+                Multi-city trip
               </span>
             </label>
           </div>

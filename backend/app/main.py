@@ -20,7 +20,6 @@ async def lifespan(app: FastAPI):
     Application lifespan manager.
     Loads data on startup and cleans up on shutdown.
     """
-    # Startup: Load data
     print("=" * 60)
     print("Starting Flight Analytics API")
     print("=" * 60)
@@ -40,11 +39,9 @@ async def lifespan(app: FastAPI):
 
     yield
 
-    # Shutdown: Cleanup
     print("\nShutting down Flight Analytics API...")
 
 
-# Create FastAPI application
 app = FastAPI(
     title="Flight Analytics API",
     description="API for querying European flight data with pricing analytics",
@@ -52,7 +49,7 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
-# Configure CORS for frontend
+# Configure CORS
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
@@ -64,7 +61,6 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Include routes
 app.include_router(router)
 app.include_router(statistics_router)
 app.include_router(search_router)
@@ -141,7 +137,6 @@ def main():
     """Main entry point for the application."""
     args = parse_args()
 
-    # Override settings with CLI arguments
     settings.host = args.host
     settings.port = args.port
     settings.data_path = args.data_path
@@ -156,7 +151,6 @@ def main():
     print(f"  Geocode cache: {settings.geocode_cache_path}")
     print()
 
-    # Run the server
     uvicorn.run(
         "app.main:app",
         host=settings.host,

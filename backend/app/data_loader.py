@@ -60,7 +60,7 @@ class DataLoader:
             # Nominatim requires a user agent
             headers = {"User-Agent": "FlightAnalytics/1.0 (Educational Project)"}
 
-            # Search for the city
+            # search for the city
             url = "https://nominatim.openstreetmap.org/search"
             params = {"q": city_name, "format": "json", "limit": 1, "addressdetails": 0}
 
@@ -75,7 +75,7 @@ class DataLoader:
                 self.geocode_cache[city_name] = coords
                 print(f"Geocoded {city_name}: ({coords.lat}, {coords.lon})")
 
-                # Respect rate limit: 1 request per second
+                # respect rate limit of 1 request per second
                 time.sleep(1)
 
                 return coords
@@ -91,17 +91,14 @@ class DataLoader:
         """Load flight data from CSV file using Polars."""
         print(f"Loading data from {self.csv_path}...")
 
-        # Convert to absolute path
         csv_path = Path(self.csv_path)
         if not csv_path.is_absolute():
-            # Resolve relative to backend directory
             backend_dir = Path(__file__).parent.parent
             csv_path = (backend_dir / self.csv_path).resolve()
 
         if not csv_path.exists():
             raise FileNotFoundError(f"CSV file not found: {csv_path}")
 
-        # Load CSV with Polars
         self.df = pl.read_csv(
             csv_path,
             dtypes={
@@ -120,11 +117,9 @@ class DataLoader:
         print(f"Loaded {len(self.df)} flight records")
         print(f"Columns: {self.df.columns}")
 
-        # Map city codes to real names
         print("Mapping city codes to real names...")
         airports = airportsdata.load("IATA")
-        
-        # Manual mapping for metropolitan codes not in airportsdata
+
         METRO_CODES = {
             "LON": "London, GB",
             "PAR": "Paris, FR",
@@ -140,9 +135,8 @@ class DataLoader:
             "KIE": "Kiev, UA",
             "BUH": "Bucharest, RO",
         }
-        
-        # Create a mapping dictionary: IATA code -> City, Country
-        # We use a fallback to the code itself if not found
+
+        # mapping dictionary: IATA code -> City, Country
         def get_city_name(code):
             if code in METRO_CODES:
                 return METRO_CODES[code]
@@ -152,31 +146,37 @@ class DataLoader:
 
         # Apply mapping to Origin and Destination
         # Note: Polars map_elements is efficient for this
-        self.df = self.df.with_columns([
-            pl.col("Origin").map_elements(get_city_name, return_dtype=pl.Utf8).alias("Origin"),
-            pl.col("Destination").map_elements(get_city_name, return_dtype=pl.Utf8).alias("Destination")
-        ])
-
-        # Hotfix Roma, IT to Rome, IT
         self.df = self.df.with_columns(
-            pl.col("Origin").replace({"Roma, IT": "Rome, IT"}).alias("Origin"),
-            pl.col("Destination").replace({"Roma, IT": "Rome, IT"}).alias("Destination"),
+            [
+                pl.col("Origin")
+                .map_elements(get_city_name, return_dtype=pl.Utf8)
+                .alias("Origin"),
+                pl.col("Destination")
+                .map_elements(get_city_name, return_dtype=pl.Utf8)
+                .alias("Destination"),
+            ]
         )
 
-        # Get unique cities
+        # fix Roma, IT to Rome, IT
+        self.df = self.df.with_columns(
+            pl.col("Origin").replace({"Roma, IT": "Rome, IT"}).alias("Origin"),
+            pl.col("Destination")
+            .replace({"Roma, IT": "Rome, IT"})
+            .alias("Destination"),
+        )
+
         unique_cities = set(
             self.df["Origin"].unique().to_list()
             + self.df["Destination"].unique().to_list()
         )
         print(f"Found {len(unique_cities)} unique cities")
 
-        # Geocode all cities
         print("Geocoding cities...")
         for city in sorted(unique_cities):
             if city not in self.geocode_cache:
                 self._geocode_city(city)
 
-        # Save cache after geocoding
+        # cache geocoding results
         self._save_geocode_cache()
 
         return self.df
@@ -208,7 +208,7 @@ class DataLoader:
         prices_series = pl.Series(prices)
 
         if exclude_high_outliers and len(prices) > 10:
-            # Exclude top 10% as high outliers, but keep low outliers
+            # exclude top 10% as high outliers, but keep low outliers
             threshold = prices_series.quantile(0.90)
             filtered_prices = prices_series.filter(prices_series <= threshold)
 
@@ -239,12 +239,11 @@ class DataLoader:
 
         prices_series = pl.Series(all_avg_prices)
 
-        # Calculate percentile thresholds
         p25 = float(prices_series.quantile(0.25))
         p50 = float(prices_series.quantile(0.50))
         p75 = float(prices_series.quantile(0.75))
 
-        # Categorize based on quartiles
+        # categorize based on quartiles
         if avg_price <= p25:
             return "budget"
         elif avg_price <= p50:
@@ -255,7 +254,6 @@ class DataLoader:
             return "premium"
 
 
-# Global instance
 data_loader: Optional[DataLoader] = None
 
 
