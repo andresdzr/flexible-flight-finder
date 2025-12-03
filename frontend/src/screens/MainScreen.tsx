@@ -2,15 +2,7 @@ import { Link } from "react-router-dom";
 import { Card } from "@/components/ui/card";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
 import { Breadcrumb } from "@/components/ui/breadcrumb";
-import {
-  Map,
-  BarChart3,
-  ArrowRight,
-  Calendar,
-  PieChart,
-  PlaneTakeoff,
-  Network,
-} from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import { FlightFinder } from "@/components/FlightFinder";
 
 export default function MainScreen() {
@@ -56,37 +48,24 @@ export default function MainScreen() {
           {/* Map Explorer Card */}
           <Link to="/map" className="group">
             <Card className="p-8 h-full hover:shadow-xl transition-all duration-300 hover:-translate-y-1 border-2 border-transparent hover:border-blue-500 dark:hover:border-blue-400">
-              <div className="flex items-start gap-4 mb-4">
-                <div className="p-3 bg-blue-100 dark:bg-blue-900 rounded-lg group-hover:scale-110 transition-transform">
-                  <Map className="w-8 h-8 text-blue-600 dark:text-blue-400" />
-                </div>
-                <div className="flex-1">
-                  <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-2 flex items-center gap-2">
-                    Interactive Map Explorer
-                    <ArrowRight className="w-5 h-5 opacity-0 group-hover:opacity-100 transition-opacity" />
-                  </h3>
-                  <p className="text-gray-600 dark:text-gray-400">
-                    Visualize flight routes on an interactive map
-                  </p>
-                </div>
+              <div className="mb-6">
+                <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-2 flex items-center gap-2">
+                  Interactive Map Explorer
+                  <ArrowRight className="w-5 h-5 opacity-0 group-hover:opacity-100 transition-opacity" />
+                </h3>
+                <p className="text-gray-600 dark:text-gray-400">
+                  Visualize flight routes on an interactive map
+                </p>
               </div>
 
-              <div className="space-y-3 mb-6">
-                <div className="flex items-center gap-3 text-gray-700 dark:text-gray-300">
+              <div className="space-y-2 mb-6">
+                <div className="flex items-center gap-3 text-gray-700 dark:text-gray-300 text-sm">
                   <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-                  <span>See all available routes from any city</span>
+                  <span>Explore routes from any city</span>
                 </div>
-                <div className="flex items-center gap-3 text-gray-700 dark:text-gray-300">
+                <div className="flex items-center gap-3 text-gray-700 dark:text-gray-300 text-sm">
                   <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
                   <span>Compare prices across destinations</span>
-                </div>
-                <div className="flex items-center gap-3 text-gray-700 dark:text-gray-300">
-                  <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-                  <span>Find the cheapest flights for each route</span>
-                </div>
-                <div className="flex items-center gap-3 text-gray-700 dark:text-gray-300">
-                  <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-                  <span>View detailed flight information</span>
                 </div>
               </div>
 
@@ -109,37 +88,24 @@ export default function MainScreen() {
           {/* Statistics Dashboard Card */}
           <Link to="/stats" className="group">
             <Card className="p-8 h-full hover:shadow-xl transition-all duration-300 hover:-translate-y-1 border-2 border-transparent hover:border-purple-500 dark:hover:border-purple-400">
-              <div className="flex items-start gap-4 mb-4">
-                <div className="p-3 bg-purple-100 dark:bg-purple-900 rounded-lg group-hover:scale-110 transition-transform">
-                  <BarChart3 className="w-8 h-8 text-purple-600 dark:text-purple-400" />
-                </div>
-                <div className="flex-1">
-                  <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-2 flex items-center gap-2">
-                    Statistics Dashboard
-                    <ArrowRight className="w-5 h-5 opacity-0 group-hover:opacity-100 transition-opacity" />
-                  </h3>
-                  <p className="text-gray-600 dark:text-gray-400">
-                    Analyze pricing trends and discover the best deals
-                  </p>
-                </div>
+              <div className="mb-6">
+                <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-2 flex items-center gap-2">
+                  Statistics Dashboard
+                  <ArrowRight className="w-5 h-5 opacity-0 group-hover:opacity-100 transition-opacity" />
+                </h3>
+                <p className="text-gray-600 dark:text-gray-400">
+                  Analyze pricing trends and discover the best deals
+                </p>
               </div>
 
-              <div className="space-y-3 mb-6">
-                <div className="flex items-center gap-3 text-gray-700 dark:text-gray-300">
+              <div className="space-y-2 mb-6">
+                <div className="flex items-center gap-3 text-gray-700 dark:text-gray-300 text-sm">
                   <div className="w-2 h-2 bg-purple-500 rounded-full"></div>
-                  <span>Calendar heatmap of daily prices</span>
+                  <span>Calendar heatmap of prices</span>
                 </div>
-                <div className="flex items-center gap-3 text-gray-700 dark:text-gray-300">
+                <div className="flex items-center gap-3 text-gray-700 dark:text-gray-300 text-sm">
                   <div className="w-2 h-2 bg-purple-500 rounded-full"></div>
-                  <span>Top 20 cheapest routes ranked</span>
-                </div>
-                <div className="flex items-center gap-3 text-gray-700 dark:text-gray-300">
-                  <div className="w-2 h-2 bg-purple-500 rounded-full"></div>
-                  <span>Price trends by day and month</span>
-                </div>
-                <div className="flex items-center gap-3 text-gray-700 dark:text-gray-300">
-                  <div className="w-2 h-2 bg-purple-500 rounded-full"></div>
-                  <span>Filter by custom date ranges</span>
+                  <span>Top cheapest routes ranked</span>
                 </div>
               </div>
 
@@ -162,35 +128,22 @@ export default function MainScreen() {
           {/* Classification Card */}
           <Link to="/classification" className="group">
             <Card className="p-8 h-full hover:shadow-xl transition-all duration-300 hover:-translate-y-1 border-2 border-transparent hover:border-green-500 dark:hover:border-green-400">
-              <div className="flex items-start gap-4 mb-4">
-                <div className="p-3 bg-green-100 dark:bg-green-900 rounded-lg group-hover:scale-110 transition-transform">
-                  <Network className="w-8 h-8 text-green-600 dark:text-green-400" />
-                </div>
-                <div className="flex-1">
-                  <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-2 flex items-center gap-2">
-                    City Classification
-                    <ArrowRight className="w-5 h-5 opacity-0 group-hover:opacity-100 transition-opacity" />
-                  </h3>
-                  <p className="text-gray-600 dark:text-gray-400">
-                    Explore clustering patterns across European cities
-                  </p>
-                </div>
+              <div className="mb-6">
+                <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-2 flex items-center gap-2">
+                  City Classification
+                  <ArrowRight className="w-5 h-5 opacity-0 group-hover:opacity-100 transition-opacity" />
+                </h3>
+                <p className="text-gray-600 dark:text-gray-400">
+                  Explore clustering patterns across European cities
+                </p>
               </div>
 
-              <div className="space-y-3 mb-6">
-                <div className="flex items-center gap-3 text-gray-700 dark:text-gray-300">
-                  <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                  <span>Geographical distance-based clusters</span>
-                </div>
-                <div className="flex items-center gap-3 text-gray-700 dark:text-gray-300">
+              <div className="space-y-2 mb-6">
+                <div className="flex items-center gap-3 text-gray-700 dark:text-gray-300 text-sm">
                   <div className="w-2 h-2 bg-green-500 rounded-full"></div>
                   <span>Network community detection</span>
                 </div>
-                <div className="flex items-center gap-3 text-gray-700 dark:text-gray-300">
-                  <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                  <span>Budget hub centrality analysis</span>
-                </div>
-                <div className="flex items-center gap-3 text-gray-700 dark:text-gray-300">
+                <div className="flex items-center gap-3 text-gray-700 dark:text-gray-300 text-sm">
                   <div className="w-2 h-2 bg-green-500 rounded-full"></div>
                   <span>ML-based hybrid clustering</span>
                 </div>
@@ -213,53 +166,9 @@ export default function MainScreen() {
           </Link>
         </div>
 
-        {/* Features Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
-          <Card className="p-6 text-center">
-            <div className="inline-flex p-3 bg-green-100 dark:bg-green-900 rounded-lg mb-4">
-              <PlaneTakeoff className="w-6 h-6 text-green-600 dark:text-green-400" />
-            </div>
-            <h4 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
-              Trip inspiration
-            </h4>
-            <p className="text-gray-600 dark:text-gray-400 text-sm">
-              Find cheap flights and trips with our comprehensive models.
-            </p>
-          </Card>
-
-          <Card className="p-6 text-center">
-            <div className="inline-flex p-3 bg-orange-100 dark:bg-orange-900 rounded-lg mb-4">
-              <Calendar className="w-6 h-6 text-orange-600 dark:text-orange-400" />
-            </div>
-            <h4 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
-              Date Flexibility
-            </h4>
-            <p className="text-gray-600 dark:text-gray-400 text-sm">
-              View prices across entire calendar months to find the best dates
-              for your trip with ease.
-            </p>
-          </Card>
-
-          <Card className="p-6 text-center">
-            <div className="inline-flex p-3 bg-pink-100 dark:bg-pink-900 rounded-lg mb-4">
-              <PieChart className="w-6 h-6 text-pink-600 dark:text-pink-400" />
-            </div>
-            <h4 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
-              Smart Analytics
-            </h4>
-            <p className="text-gray-600 dark:text-gray-400 text-sm">
-              Leverage data-driven insights to understand pricing patterns and
-              make informed decisions.
-            </p>
-          </Card>
-        </div>
-
         {/* Footer Info */}
         <div className="text-center text-gray-600 dark:text-gray-400 text-sm">
-          <p>
-            Powered by real flight data • Updated regularly • European routes
-            only
-          </p>
+          <p>Powered by scraped flight data • European routes only</p>
         </div>
       </div>
     </div>

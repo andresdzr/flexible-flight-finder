@@ -5,14 +5,7 @@ import { Breadcrumb } from "@/components/ui/breadcrumb";
 import { MapContainer, TileLayer, CircleMarker, Tooltip } from "react-leaflet";
 import { useTheme } from "next-themes";
 import { type LatLngExpression } from "leaflet";
-import {
-  Network,
-  MapPin,
-  TrendingUp,
-  Info,
-  Compass,
-  Layers,
-} from "lucide-react";
+import { Info, Compass } from "lucide-react";
 import "leaflet/dist/leaflet.css";
 
 const CITY_COORDS: Record<string, [number, number]> = {
@@ -209,21 +202,70 @@ export default function ClassificationScreen() {
           </div>
         </header>
 
+        {/* Detailed Methodology Section */}
+        <Card className="p-8 mt-8">
+          <h2 className="text-3xl font-bold mb-6 text-gray-900 dark:text-white">
+            Methodology & Goals
+          </h2>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div>
+              <div className="flex items-center gap-3 mb-4">
+                <h3 className="text-xl font-semibold text-gray-900 dark:text-white">
+                  Goal 1: Geography
+                </h3>
+              </div>
+              <p className="text-gray-700 dark:text-gray-300 text-sm leading-relaxed">
+                Identify geographical clusters using distance-based methods. By
+                computing pairwise distances between cities and applying both
+                Agglomerative and Spectral Clustering, we uncover natural
+                geographical partitions that serve as a baseline for comparison.
+              </p>
+            </div>
+
+            <div>
+              <div className="flex items-center gap-3 mb-4">
+                <h3 className="text-xl font-semibold text-gray-900 dark:text-white">
+                  Goal 2: Network
+                </h3>
+              </div>
+              <p className="text-gray-700 dark:text-gray-300 text-sm leading-relaxed">
+                Model Europe as a network of cheap-flight connections. Using
+                Louvain Community Detection and betweenness centrality, we
+                identify regions densely interconnected through affordable
+                travel and find cities acting as key bridges between zones.
+              </p>
+            </div>
+
+            <div>
+              <div className="flex items-center gap-3 mb-4">
+                <h3 className="text-xl font-semibold text-gray-900 dark:text-white">
+                  Goal 3: Hybrid
+                </h3>
+              </div>
+              <p className="text-gray-700 dark:text-gray-300 text-sm leading-relaxed">
+                Discover deeper structural patterns using Node2Vec embeddings
+                and hybrid clustering. By combining graph structure with tabular
+                features and applying K-means, we reveal hidden patterns like
+                cities with similar cost behavior and connectivity roles.
+              </p>
+            </div>
+          </div>
+        </Card>
+
         {/* Classification Selector */}
-        <Card className="p-6 mb-8">
+        <Card className="p-6 mb-8 mt-8">
           <h2 className="text-xl font-semibold mb-4 text-gray-900 dark:text-white">
             Select Classification Method
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             <button
               onClick={() => setActiveClassification("geographical")}
-              className={`p-4 rounded-lg border-2 transition-all ${
+              className={`p-4 rounded-lg border-2 transition-all cursor-pointer ${
                 activeClassification === "geographical"
                   ? "border-blue-500 bg-blue-50 dark:bg-blue-950"
                   : "border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600"
               }`}
             >
-              <MapPin className="w-6 h-6 mb-2 text-blue-600 dark:text-blue-400" />
               <h3 className="font-semibold text-gray-900 dark:text-white">
                 Geographical
               </h3>
@@ -234,13 +276,12 @@ export default function ClassificationScreen() {
 
             <button
               onClick={() => setActiveClassification("louvain")}
-              className={`p-4 rounded-lg border-2 transition-all ${
+              className={`p-4 rounded-lg border-2 transition-all cursor-pointer ${
                 activeClassification === "louvain"
-                  ? "border-green-500 bg-green-50 dark:bg-green-950"
+                  ? "border-blue-500 bg-blue-50 dark:bg-blue-950"
                   : "border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600"
               }`}
             >
-              <Network className="w-6 h-6 mb-2 text-green-600 dark:text-green-400" />
               <h3 className="font-semibold text-gray-900 dark:text-white">
                 Network Communities
               </h3>
@@ -251,13 +292,12 @@ export default function ClassificationScreen() {
 
             <button
               onClick={() => setActiveClassification("budget")}
-              className={`p-4 rounded-lg border-2 transition-all ${
+              className={`p-4 rounded-lg border-2 transition-all cursor-pointer ${
                 activeClassification === "budget"
-                  ? "border-emerald-500 bg-emerald-50 dark:bg-emerald-950"
+                  ? "border-blue-500 bg-blue-50 dark:bg-blue-950"
                   : "border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600"
               }`}
             >
-              <TrendingUp className="w-6 h-6 mb-2 text-emerald-600 dark:text-emerald-400" />
               <h3 className="font-semibold text-gray-900 dark:text-white">
                 Budget Hubs
               </h3>
@@ -268,13 +308,12 @@ export default function ClassificationScreen() {
 
             <button
               onClick={() => setActiveClassification("hybrid")}
-              className={`p-4 rounded-lg border-2 transition-all ${
+              className={`p-4 rounded-lg border-2 transition-all cursor-pointer ${
                 activeClassification === "hybrid"
-                  ? "border-purple-500 bg-purple-50 dark:bg-purple-950"
+                  ? "border-blue-500 bg-blue-50 dark:bg-blue-950"
                   : "border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600"
               }`}
             >
-              <Layers className="w-6 h-6 mb-2 text-purple-600 dark:text-purple-400" />
               <h3 className="font-semibold text-gray-900 dark:text-white">
                 Hybrid Clustering
               </h3>
@@ -520,126 +559,108 @@ export default function ClassificationScreen() {
           </div>
         </div>
 
-        {/* Detailed Methodology Section */}
-        <Card className="p-8 mt-8">
-          <h2 className="text-3xl font-bold mb-6 text-gray-900 dark:text-white">
-            Methodology & Goals
-          </h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div>
-              <div className="flex items-center gap-3 mb-4">
-                <div className="w-10 h-10 rounded-lg bg-blue-100 dark:bg-blue-900 flex items-center justify-center">
-                  <MapPin className="w-6 h-6 text-blue-600 dark:text-blue-400" />
-                </div>
-                <h3 className="text-xl font-semibold text-gray-900 dark:text-white">
-                  Goal 1: Geography
-                </h3>
-              </div>
-              <p className="text-gray-700 dark:text-gray-300 text-sm leading-relaxed">
-                Identify geographical clusters using distance-based methods. By
-                computing pairwise distances between cities and applying both
-                Agglomerative and Spectral Clustering, we uncover natural
-                geographical partitions that serve as a baseline for comparison.
-              </p>
-            </div>
-
-            <div>
-              <div className="flex items-center gap-3 mb-4">
-                <div className="w-10 h-10 rounded-lg bg-green-100 dark:bg-green-900 flex items-center justify-center">
-                  <Network className="w-6 h-6 text-green-600 dark:text-green-400" />
-                </div>
-                <h3 className="text-xl font-semibold text-gray-900 dark:text-white">
-                  Goal 2: Network
-                </h3>
-              </div>
-              <p className="text-gray-700 dark:text-gray-300 text-sm leading-relaxed">
-                Model Europe as a network of cheap-flight connections. Using
-                Louvain Community Detection and betweenness centrality, we
-                identify regions densely interconnected through affordable
-                travel and find cities acting as key bridges between zones.
-              </p>
-            </div>
-
-            <div>
-              <div className="flex items-center gap-3 mb-4">
-                <div className="w-10 h-10 rounded-lg bg-purple-100 dark:bg-purple-900 flex items-center justify-center">
-                  <Layers className="w-6 h-6 text-purple-600 dark:text-purple-400" />
-                </div>
-                <h3 className="text-xl font-semibold text-gray-900 dark:text-white">
-                  Goal 3: Hybrid
-                </h3>
-              </div>
-              <p className="text-gray-700 dark:text-gray-300 text-sm leading-relaxed">
-                Discover deeper structural patterns using Node2Vec embeddings
-                and hybrid clustering. By combining graph structure with tabular
-                features and applying K-means, we reveal hidden patterns like
-                cities with similar cost behavior and connectivity roles.
-              </p>
-            </div>
-          </div>
-        </Card>
-
         {/* City Lists */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-8">
           {activeClassification === "geographical" &&
             Object.entries(CLASSIFICATION_DATA.geographical).map(
               ([region, cities]) => (
-                <Card key={region} className="p-6">
-                  <h3 className="text-lg font-semibold mb-3 capitalize text-gray-900 dark:text-white">
-                    {region.replace(/_/g, " ")}
-                  </h3>
-                  <div className="flex items-center gap-2 mb-3">
+                <Card
+                  key={region}
+                  className="p-6 border-2 hover:shadow-lg transition-all"
+                  style={{ borderColor: GEOGRAPHICAL_COLORS[region] + "40" }}
+                >
+                  <div className="flex items-center gap-3 mb-4">
                     <div
-                      className="w-4 h-4 rounded-full border-2 border-white"
-                      style={{ backgroundColor: GEOGRAPHICAL_COLORS[region] }}
-                    />
-                    <span className="text-sm text-gray-600 dark:text-gray-400">
-                      {cities.length} cities
-                    </span>
+                      className="w-8 h-8 rounded-lg flex items-center justify-center"
+                      style={{
+                        backgroundColor: GEOGRAPHICAL_COLORS[region] + "20",
+                      }}
+                    >
+                      <div
+                        className="w-4 h-4 rounded-full"
+                        style={{ backgroundColor: GEOGRAPHICAL_COLORS[region] }}
+                      />
+                    </div>
+                    <div>
+                      <h3 className="text-lg font-bold capitalize text-gray-900 dark:text-white">
+                        {region.replace(/_/g, " ")}
+                      </h3>
+                      <span className="text-xs text-gray-500 dark:text-gray-400">
+                        {cities.length} cities
+                      </span>
+                    </div>
                   </div>
-                  <ul className="space-y-2 text-sm text-gray-700 dark:text-gray-300">
+                  <div className="space-y-1.5">
                     {cities.map((city) => (
-                      <li key={city} className="flex items-center gap-2">
-                        <span className="text-gray-400">•</span>
-                        {city}
-                      </li>
+                      <div
+                        key={city}
+                        className="flex items-center gap-2 py-1 px-2 rounded hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
+                      >
+                        <div
+                          className="w-1.5 h-1.5 rounded-full"
+                          style={{
+                            backgroundColor: GEOGRAPHICAL_COLORS[region],
+                          }}
+                        />
+                        <span className="text-sm text-gray-700 dark:text-gray-300 font-medium">
+                          {city}
+                        </span>
+                      </div>
                     ))}
-                  </ul>
+                  </div>
                 </Card>
               )
             )}
 
           {activeClassification === "louvain" &&
             Object.entries(CLASSIFICATION_DATA.louvain_communities).map(
-              ([community, cities]) => (
-                <Card key={community} className="p-6">
-                  <h3 className="text-lg font-semibold mb-3 capitalize text-gray-900 dark:text-white">
-                    {community.replace(/_/g, " ")}
-                  </h3>
-                  <div className="flex items-center gap-2 mb-3">
-                    <div
-                      className="w-4 h-4 rounded-full border-2 border-white"
-                      style={{
-                        backgroundColor:
-                          LOUVAIN_COLORS[
-                            community as keyof typeof LOUVAIN_COLORS
-                          ],
-                      }}
-                    />
-                    <span className="text-sm text-gray-600 dark:text-gray-400">
-                      {cities.length} cities
-                    </span>
-                  </div>
-                  <ul className="space-y-2 text-sm text-gray-700 dark:text-gray-300">
-                    {cities.map((city) => (
-                      <li key={city} className="flex items-center gap-2">
-                        <span className="text-gray-400">•</span>
-                        {city}
-                      </li>
-                    ))}
-                  </ul>
-                </Card>
-              )
+              ([community, cities]) => {
+                const color =
+                  LOUVAIN_COLORS[community as keyof typeof LOUVAIN_COLORS];
+                return (
+                  <Card
+                    key={community}
+                    className="p-6 border-2 hover:shadow-lg transition-all"
+                    style={{ borderColor: color + "40" }}
+                  >
+                    <div className="flex items-center gap-3 mb-4">
+                      <div
+                        className="w-8 h-8 rounded-lg flex items-center justify-center"
+                        style={{ backgroundColor: color + "20" }}
+                      >
+                        <div
+                          className="w-4 h-4 rounded-full"
+                          style={{ backgroundColor: color }}
+                        />
+                      </div>
+                      <div>
+                        <h3 className="text-lg font-bold capitalize text-gray-900 dark:text-white">
+                          {community.replace(/_/g, " ")}
+                        </h3>
+                        <span className="text-xs text-gray-500 dark:text-gray-400">
+                          {cities.length} cities
+                        </span>
+                      </div>
+                    </div>
+                    <div className="space-y-1.5">
+                      {cities.map((city) => (
+                        <div
+                          key={city}
+                          className="flex items-center gap-2 py-1 px-2 rounded hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
+                        >
+                          <div
+                            className="w-1.5 h-1.5 rounded-full"
+                            style={{ backgroundColor: color }}
+                          />
+                          <span className="text-sm text-gray-700 dark:text-gray-300 font-medium">
+                            {city}
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  </Card>
+                );
+              }
             )}
 
           {activeClassification === "budget" && (
@@ -669,43 +690,76 @@ export default function ClassificationScreen() {
 
           {activeClassification === "hybrid" &&
             Object.entries(CLASSIFICATION_DATA.hybrid_clusters).map(
-              ([cluster, cities]) => (
-                <Card key={cluster} className="p-6">
-                  <h3 className="text-lg font-semibold mb-3 capitalize text-gray-900 dark:text-white">
-                    {cluster.replace(/_/g, " ")}
-                  </h3>
-                  <div className="flex items-center gap-2 mb-3">
-                    <div
-                      className="w-4 h-4 rounded-full border-2 border-white"
-                      style={{
-                        backgroundColor:
-                          HYBRID_COLORS[cluster as keyof typeof HYBRID_COLORS],
-                      }}
-                    />
-                    <span className="text-sm text-gray-600 dark:text-gray-400">
-                      {cities.length} cities
-                    </span>
-                  </div>
-                  <ul className="space-y-2 text-sm text-gray-700 dark:text-gray-300">
-                    {cities.map((city) => (
-                      <li key={city} className="flex items-center gap-2">
-                        <span className="text-gray-400">•</span>
-                        {city}
-                      </li>
-                    ))}
-                  </ul>
-                  <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
-                    <p className="text-xs text-gray-600 dark:text-gray-400">
-                      {cluster === "cluster_0" &&
-                        "High-cost peripheral outliers with expensive flights and lower connectivity"}
-                      {cluster === "cluster_1" &&
-                        "Major European hubs with high connectivity and competitive pricing"}
-                      {cluster === "cluster_2" &&
-                        "Balanced mid-range connectors with moderate pricing and stable connectivity"}
-                    </p>
-                  </div>
-                </Card>
-              )
+              ([cluster, cities]) => {
+                const color =
+                  HYBRID_COLORS[cluster as keyof typeof HYBRID_COLORS];
+                const clusterInfo = {
+                  cluster_0: {
+                    label: "High-Cost Peripheral",
+                    desc: "Expensive outliers with lower connectivity",
+                  },
+                  cluster_1: {
+                    label: "Major Hubs",
+                    desc: "High connectivity & competitive pricing",
+                  },
+                  cluster_2: {
+                    label: "Balanced Connectors",
+                    desc: "Mid-range pricing & stable connectivity",
+                  },
+                };
+                const info = clusterInfo[cluster as keyof typeof clusterInfo];
+                return (
+                  <Card
+                    key={cluster}
+                    className="p-6 border-2 hover:shadow-lg transition-all"
+                    style={{ borderColor: color + "40" }}
+                  >
+                    <div className="mb-4">
+                      <div className="flex items-center gap-3 mb-2">
+                        <div
+                          className="w-8 h-8 rounded-lg flex items-center justify-center"
+                          style={{ backgroundColor: color + "20" }}
+                        >
+                          <div
+                            className="w-4 h-4 rounded-full"
+                            style={{ backgroundColor: color }}
+                          />
+                        </div>
+                        <div className="flex-1">
+                          <h3 className="text-lg font-bold text-gray-900 dark:text-white">
+                            {info.label}
+                          </h3>
+                          <span className="text-xs text-gray-500 dark:text-gray-400">
+                            {cities.length} cities
+                          </span>
+                        </div>
+                      </div>
+                      <p
+                        className="text-xs text-gray-600 dark:text-gray-400 italic px-2 py-1.5 rounded"
+                        style={{ backgroundColor: color + "10" }}
+                      >
+                        {info.desc}
+                      </p>
+                    </div>
+                    <div className="space-y-1.5">
+                      {cities.map((city) => (
+                        <div
+                          key={city}
+                          className="flex items-center gap-2 py-1 px-2 rounded hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
+                        >
+                          <div
+                            className="w-1.5 h-1.5 rounded-full"
+                            style={{ backgroundColor: color }}
+                          />
+                          <span className="text-sm text-gray-700 dark:text-gray-300 font-medium">
+                            {city}
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  </Card>
+                );
+              }
             )}
         </div>
       </div>
