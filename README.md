@@ -7,9 +7,10 @@ A full-stack web application for exploring and analyzing European flight data wi
 ```
 .
 ├── backend/          # FastAPI backend server
+├── data/             # Data needed for backend
 ├── frontend/         # React + TypeScript frontend
-├── scraper/          # Data collection scripts
-└── doc/              # Documentation and diagrams
+├── model/            # Flight Price Prediction Model and Trip Optimizer
+└── scraper/          # Data collection scripts
 ```
 
 ## Quick Start

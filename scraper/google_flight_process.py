@@ -4,9 +4,8 @@ from geopy.distance import geodesic
 import argparse
 import airportsdata
 
-# 1. Map City Names to their Primary International Airport IATA Code
-# We use the airport code (e.g., LHR) rather than the city code (LON) 
-# to ensure we get specific coordinates from the airportsdata library.
+# Map City Names to their Primary International Airport IATA Code
+# Static :(
 CITY_TO_IATA_MAPPING = {
     # Train set Cities
     "Madrid": "MAD",
@@ -47,31 +46,15 @@ CITY_TO_IATA_MAPPING = {
 }
 
 # Define the date the data was scraped to calculate "Days Until Departure"
-# NOTE: Update this date if you scrape a new batch!
 SCRAPE_DATE = datetime.datetime(2025, 12, 2)
 
 def main(input_file: str, output_file: str):
-    # ---------------------------------------------------------
-    # 1. Load External Data
-    # ---------------------------------------------------------
-    try:
-        print("🌍 Loading Global Airport Database (airportsdata)...")
-        airports = airportsdata.load('IATA') 
-    except ImportError:
-        print("❌ Error: Please install airportsdata: pip install airportsdata")
-        return
+    airports = airportsdata.load('IATA') 
     
-    print(f"📂 Loading Input CSV: {input_file}...")
-    try:
-        df = pd.read_csv(input_file)
-    except FileNotFoundError:
-        print("❌ Input file not found. Please check the path.")
-        return
+    print(f"Loading Input CSV: {input_file}...")
+    df = pd.read_csv(input_file)
 
-    # ---------------------------------------------------------
-    # 2. Clean Price Column
-    # ---------------------------------------------------------
-    print("🧹 Cleaning Price column...")
+    print("Cleaning Price column...")
     # Remove currency symbols (€, $, £) and commas, convert to float
     df['Price'] = df['Price'].astype(str).str.replace(r'[^\d.]', '', regex=True)
     df['Price'] = pd.to_numeric(df['Price'], errors='coerce')
@@ -80,14 +63,11 @@ def main(input_file: str, output_file: str):
     initial_len = len(df)
     df = df.dropna(subset=['Price'])
     if initial_len != len(df):
-        print(f"   ⚠️ Dropped {initial_len - len(df)} rows with invalid prices.")
+        print(f"Dropped {initial_len - len(df)} rows with invalid prices.")
         
     df = df.rename(columns={"Price": "Price_in_EUR"})
 
-    # ---------------------------------------------------------
-    # 3. Dynamic Lookup & Feature Engineering
-    # ---------------------------------------------------------
-    print("✈️  Mapping Cities to IATA, Coordinates, and Countries...")
+    print("Mapping Cities to IATA, Coordinates, and Countries...")
 
     # Helper function to look up data
     def get_route_details(row):
@@ -142,10 +122,7 @@ def main(input_file: str, output_file: str):
         print(f"   ⚠️ Warning: Could not calculate distance for {missing_data_count} flights (City not in mapping). Dropping them.")
         df = df.dropna(subset=['Distance_km'])
 
-    # ---------------------------------------------------------
-    # 4. Date Features Splitting
-    # ---------------------------------------------------------
-    print("📅 Splitting Dates...")
+    print("Splitting Dates...")
     df['Date'] = pd.to_datetime(df['Date'])
     
     df['Year'] = df['Date'].dt.year
@@ -156,9 +133,6 @@ def main(input_file: str, output_file: str):
     # Calculate days left (ensure you have a logical SCRAPE_DATE)
     df['Days_until_departure'] = (df['Date'] - SCRAPE_DATE).dt.days
 
-    # ---------------------------------------------------------
-    # 5. Save Final Dataset
-    # ---------------------------------------------------------
     df.to_csv(output_file, index=False)
     print(f"🎉 Success! Enriched data saved to {output_file}")
 

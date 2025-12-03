@@ -5,22 +5,14 @@ class AirportService:
     def __init__(self):
         # Load airports data using IATA codes as keys
         self.airports = airportsdata.load('IATA')
-        # Manual mapping for major city codes that might not be in airportsdata as airports
+        # Manual mapping for cities that make fitna
         self.CITY_CODES = {
             "paris": "PAR",
             "london": "LON",
-            "new york": "NYC",
             "rome": "ROM",
             "milan": "MIL",
-            "moscow": "MOW",
             "berlin": "BER",
-            "tokyo": "TYO",
-            "osaka": "OSA",
-            "beijing": "BJS",
-            "bangkok": "BKK",
             "istanbul": "IST",
-            "rio de janeiro": "RIO",
-            "sao paulo": "SAO",
         }
 
         # Build city name to IATA code mapping

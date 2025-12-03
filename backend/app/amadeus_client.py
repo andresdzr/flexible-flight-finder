@@ -3,9 +3,10 @@ from datetime import datetime, timedelta
 from app.config import settings
 from fastapi import HTTPException
 
-
+# TODO: switch to Amadeus SDK
 class AmadeusClient:
     def __init__(self):
+        # !!! Test base URL, since we don't have real API keys yet
         self.base_url = "https://test.api.amadeus.com"
         self.client_id = settings.amadeus_api_key
         self.client_secret = settings.amadeus_api_secret
@@ -36,8 +37,6 @@ class AmadeusClient:
                 )
             except httpx.HTTPError as e:
                 print(f"Authentication failed: {e}")
-                # For now, if auth fails (e.g. empty keys), we might want to handle it gracefully or let it fail
-                # But since user said "leave empty for now", we should probably expect this to fail if we try to use it without keys.
                 pass
 
     async def search_flight_destinations(
@@ -55,8 +54,6 @@ class AmadeusClient:
         await self.authenticate()
 
         if not self.token:
-            # If no token (e.g. missing credentials), return empty list or raise error
-            # For this task, we'll return None to signal fallback to mock data or empty
             return None
 
         url = f"{self.base_url}/v1/shopping/flight-destinations"
@@ -80,7 +77,6 @@ class AmadeusClient:
             try:
                 response = await client.get(url, params=params, headers=headers)
                 response.raise_for_status()
-                print(response.json())
                 return response.json()
             except httpx.HTTPError as e:
                 print(f"Amadeus API request failed: {e}")
