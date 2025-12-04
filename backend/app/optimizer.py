@@ -1,4 +1,3 @@
-# simple_optimizer.py
 from datetime import datetime, date, timedelta
 from typing import Dict, Tuple, List, Any, Optional
 import os, json
