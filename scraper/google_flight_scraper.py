@@ -131,12 +131,13 @@ def scrape_route(driver, origin, destination, months, output_file):
 
                     # Try finding price div first
                     try:
+
                         price_element = cell.find_element(
                             By.CSS_SELECTOR, "div[jsname='qCDwBb']"
                         )
                         price_value = price_element.text.strip()
                     except:
-                        # alternative if google changes structure
+                        # Fallback text parsing
                         for line in price_text:
                             if (
                                 "€" in line
@@ -146,8 +147,16 @@ def scrape_route(driver, origin, destination, months, output_file):
                             ):
                                 price_value = line.strip()
                                 break
-
-                    prices_map[iso_date] = price_value
+                    if price_value:
+                        clean_price = (
+                            price_value.replace("€", "")
+                            .replace("$", "")
+                            .replace("£", "")
+                            .replace(",", "")
+                            .strip()
+                        )
+                        if clean_price.isdigit():
+                            prices_map[iso_date] = price_value
 
                 except Exception:
                     continue
@@ -213,7 +222,7 @@ def main(months,output_file):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Scrapes Google Flights for flight prices between specified cities.")
-    parser.add_argument("months", help="Months to scrape", type=str)
+    parser.add_argument("months", help="Months to scrape", type=int)
     parser.add_argument("output", help="The path where the enriched CSV file should be saved", type=str)
     args = parser.parse_args()
     
