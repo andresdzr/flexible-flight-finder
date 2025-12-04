@@ -6,7 +6,7 @@ class Settings(BaseSettings):
 
     host: str = "0.0.0.0"
     port: int = 8000
-    data_path: str = "../scraper/european_flight_data_enriched.csv"
+    data_path: str = "../data/european_flight_data_enriched.csv"
     reload: bool = False
     geocode_cache_path: str = "geocode_cache.json"
     amadeus_api_key: str = ""

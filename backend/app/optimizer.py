@@ -112,7 +112,7 @@ def optimizer(
         - Includes daily windows for each month so that flights occur in valid time ranges.
     """
     if csv_path is None:
-        csv_path = os.path.join(os.getcwd(), "vuelos_kayak_clean_final.csv")
+        csv_path = os.path.join(os.getcwd(), "./data/vuelos_kayak_clean_final.csv")
     if not os.path.isfile(csv_path):
         raise FileNotFoundError(f"CSV not found at '{csv_path}'")
 

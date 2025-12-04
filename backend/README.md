@@ -57,7 +57,7 @@ The API will be available at `http://localhost:8000`
 python -m app.main --host 0.0.0.0 --port 8080
 
 # Custom data path
-python -m app.main --data-path ../scraper/european_flight_data_enriched.csv
+python -m app.main --data-path ../data/european_flight_data_enriched.csv
 
 # Enable auto-reload for development
 python -m app.main --reload
@@ -247,7 +247,7 @@ The project follows PEP 8 style guidelines. Key points:
 
 ### Data not loading
 
-- Check that CSV path is correct (default: `../scraper/european_flight_data_enriched.csv`)
+- Check that CSV path is correct (default: `../data/european_flight_data_enriched.csv`)
 - Verify CSV file exists and has correct format
 - Check logs for specific error messages
 

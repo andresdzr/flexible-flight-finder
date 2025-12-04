@@ -57,6 +57,7 @@ export function MulticityTripCard({ trip }: MulticityTripCardProps) {
     Edinburgh: { lat: 55.9533, lon: -3.1883 },
     Manchester: { lat: 53.4808, lon: -2.2426 },
     Porto: { lat: 41.1579, lon: -8.6291 },
+    Bucharest: { lat: 44.4267, lon: 26.1025 },
   };
 
   // Update route segments with coordinates
