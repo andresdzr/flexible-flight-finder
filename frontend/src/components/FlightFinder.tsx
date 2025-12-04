@@ -10,8 +10,8 @@ export function FlightFinder() {
   const [origin, setOrigin] = useState("Madrid");
   const [minDays, setMinDays] = useState(4);
   const [maxDays, setMaxDays] = useState(7);
-  const [startDate, setStartDate] = useState("2025-12-30");
-  const [endDate, setEndDate] = useState("2026-03-15");
+  const [startDate, setStartDate] = useState("2026-01-15");
+  const [endDate, setEndDate] = useState("2026-02-15");
   const [maxPrice, setMaxPrice] = useState(400);
   const [nonStop, setNonStop] = useState(false);
   const [oneWay, setOneWay] = useState(false);

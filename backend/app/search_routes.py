@@ -86,6 +86,9 @@ async def search_flights(
                                 origin_code, dest_code
                             )
 
+                            if (distance == 0):
+                                continue
+
                             # Get country codes
                             origin_country = airport_service.get_country_code(
                                 origin_code

@@ -7,7 +7,7 @@ from fastapi import HTTPException
 class AmadeusClient:
     def __init__(self):
         # !!! Test base URL, since we don't have real API keys yet
-        self.base_url = "https://test.api.amadeus.com"
+        self.base_url = "https://api.amadeus.com"
         self.client_id = settings.amadeus_api_key
         self.client_secret = settings.amadeus_api_secret
         self.token = None
