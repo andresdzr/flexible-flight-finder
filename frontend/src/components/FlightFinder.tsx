@@ -99,10 +99,9 @@ export function FlightFinder() {
         {/* Second Row: Duration and Price */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {/* Duration Range */}
-          <div
-            className={`space-y-2 transition-opacity duration-200 ${
-              oneWay ? "opacity-50" : ""
-            }`}
+          {!multicity && (<div
+            className={`space-y-2 transition-opacity duration-200 ${oneWay ? "opacity-50" : ""
+              }`}
           >
             <label className="text-sm font-medium text-gray-700 dark:text-gray-300 flex items-center gap-2">
               <Clock className="w-4 h-4" />
@@ -113,7 +112,7 @@ export function FlightFinder() {
                 type="number"
                 value={minDays}
                 onChange={(e) => setMinDays(Number(e.target.value))}
-                disabled={oneWay}
+                disabled={oneWay || multicity}
                 min="1"
                 className="flex-1 p-2.5 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition-all disabled:cursor-not-allowed disabled:opacity-50"
                 placeholder="Min"
@@ -123,13 +122,62 @@ export function FlightFinder() {
                 type="number"
                 value={maxDays}
                 onChange={(e) => setMaxDays(Number(e.target.value))}
-                disabled={oneWay}
+                disabled={oneWay || multicity}
                 min={minDays}
                 className="flex-1 p-2.5 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition-all disabled:cursor-not-allowed disabled:opacity-50"
                 placeholder="Max"
               />
             </div>
           </div>
+          )}
+
+          {/* City Type Filter (only visible for multi-city trips) */}
+          {multicity && (
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-gray-700 dark:text-gray-300 flex items-center gap-2">
+                <MapPin className="w-4 h-4" />
+                Filter Cities (Optional)
+              </label>
+              <select
+                value={cityTypeKey}
+                onChange={(e) => setCityTypeKey(e.target.value)}
+                className="w-full p-2.5 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition-all cursor-pointer"
+              >
+                <option value="">All Cities</option>
+                <optgroup label="Geographical">
+                  <option value="western_europe">Western Europe</option>
+                  <option value="northern_europe">Northern Europe</option>
+                  <option value="iberian_peninsula">Iberian Peninsula</option>
+                  <option value="eastern_europe">Eastern Europe</option>
+                  <option value="central_europe">Central Europe</option>
+                </optgroup>
+                <optgroup label="Network Communities">
+                  <option value="louvain_community_1">Community 1</option>
+                  <option value="louvain_community_2">Community 2</option>
+                </optgroup>
+                <optgroup label="Budget Hubs">
+                  <option value="budget_hubs">Budget Hubs</option>
+                </optgroup>
+                <optgroup label="Hybrid Clusters">
+                  <option value="cluster_0">
+                    Cluster 0 - High-Cost Peripheral
+                  </option>
+                  <option value="cluster_1">Cluster 1 - Major Hubs</option>
+                  <option value="cluster_2">
+                    Cluster 2 - Balanced Connectors
+                  </option>
+                </optgroup>
+              </select>
+              {cityTypeKey && (
+                <p className="text-xs text-gray-500 dark:text-gray-400">
+                  Limiting search to:{" "}
+                  {(classificationData as unknown as Record<string, string[]>)[
+                    cityTypeKey
+                  ]?.join(", ") || "Unknown"}
+                </p>
+              )}
+            </div>
+          )}
 
           {/* Max Price */}
           <div className="space-y-2">
@@ -147,54 +195,6 @@ export function FlightFinder() {
             />
           </div>
         </div>
-
-        {/* City Type Filter (only visible for multi-city trips) */}
-        {multicity && (
-          <div className="space-y-2">
-            <label className="text-sm font-medium text-gray-700 dark:text-gray-300 flex items-center gap-2">
-              <MapPin className="w-4 h-4" />
-              Filter Cities (Optional)
-            </label>
-            <select
-              value={cityTypeKey}
-              onChange={(e) => setCityTypeKey(e.target.value)}
-              className="w-full p-2.5 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition-all cursor-pointer"
-            >
-              <option value="">All Cities</option>
-              <optgroup label="Geographical">
-                <option value="western_europe">Western Europe</option>
-                <option value="northern_europe">Northern Europe</option>
-                <option value="iberian_peninsula">Iberian Peninsula</option>
-                <option value="eastern_europe">Eastern Europe</option>
-                <option value="central_europe">Central Europe</option>
-              </optgroup>
-              <optgroup label="Network Communities">
-                <option value="louvain_community_1">Community 1</option>
-                <option value="louvain_community_2">Community 2</option>
-              </optgroup>
-              <optgroup label="Budget Hubs">
-                <option value="budget_hubs">Budget Hubs</option>
-              </optgroup>
-              <optgroup label="Hybrid Clusters">
-                <option value="cluster_0">
-                  Cluster 0 - High-Cost Peripheral
-                </option>
-                <option value="cluster_1">Cluster 1 - Major Hubs</option>
-                <option value="cluster_2">
-                  Cluster 2 - Balanced Connectors
-                </option>
-              </optgroup>
-            </select>
-            {cityTypeKey && (
-              <p className="text-xs text-gray-500 dark:text-gray-400">
-                Limiting search to:{" "}
-                {(classificationData as unknown as Record<string, string[]>)[
-                  cityTypeKey
-                ]?.join(", ") || "Unknown"}
-              </p>
-            )}
-          </div>
-        )}
 
         {/* Options & Search */}
         <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-2">

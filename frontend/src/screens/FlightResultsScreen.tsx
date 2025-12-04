@@ -161,7 +161,7 @@ export default function FlightResultsScreen() {
                   {`${startDate} - ${endDate}`}
                 </span>
               </div>
-              {!oneWay && (
+              {!oneWay && !multicity && (
                 <div className="flex items-center gap-2">
                   <Clock className="w-4 h-4 text-blue-500" />
                   <span>
@@ -358,13 +358,12 @@ export default function FlightResultsScreen() {
                         </div>
                         {flight.price_trend && (
                           <div
-                            className={`mt-2 inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-bold ${
-                              flight.price_trend === "falling"
-                                ? "bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400"
-                                : flight.price_trend === "rising"
+                            className={`mt-2 inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-bold ${flight.price_trend === "falling"
+                              ? "bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400"
+                              : flight.price_trend === "rising"
                                 ? "bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400"
                                 : "bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400"
-                            }`}
+                              }`}
                           >
                             {flight.price_trend === "falling" ? (
                               <>

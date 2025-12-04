@@ -223,24 +223,24 @@ async def search_multicity_flights(
                 trip=None, status="error", message="Flight data CSV not found"
             )
 
-        # Call optimizer
-        result = optimizer(
-            start_date=start,
-            end_date=end,
-            budget=max_price,
-            origin=origin_name,
-            csv_path=csv_path,
-            city_type_key=city_type_key,
-            verbose=False,
-            min_days_per_city=1,
-        )
-
-        # Check if optimization was successful
-        if result["termination"] not in ("optimal", "feasible"):
+        try:
+            # Call optimizer
+            result = optimizer(
+                start_date=start,
+                end_date=end,
+                budget=max_price,
+                origin=origin_name,
+                csv_path=csv_path,
+                city_type_key=city_type_key,
+                verbose=False,
+                min_days_per_city=1,
+            )
+        except Exception as e:
+            print(f"Error calling optimizer: {e}")
             return MulticitySearchResponse(
                 trip=None,
                 status="no_solution",
-                message=f"No optimal trip found within budget. Status: {result['status']}",
+                message=f"No optimal trip found within budget.",
             )
 
         # Extract the trip details
