@@ -1,9 +1,7 @@
 import joblib
 import os
-import logging
-from typing import List, Dict, Any, Optional
+from typing import Dict, Any, Optional
 import pandas as pd
-import numpy as np
 
 
 class PricePredictorService:
@@ -60,11 +58,11 @@ class PricePredictorService:
                 "Distance_km": [flight_data.get("distance_km")],
                 "Weekday": [flight_data.get("weekday")],
                 "Month": [flight_data.get("month")],
-                "Days_until_departure": [flight_data.get("days_until_departure", 30)],
-                "Origin_Lat": [flight_data.get("origin_lat", 0.0)],
-                "Origin_Lon": [flight_data.get("origin_lon", 0.0)],
-                "Destination_Lat": [flight_data.get("dest_lat", 0.0)],
-                "Destination_Lon": [flight_data.get("dest_lon", 0.0)],
+                "Days_until_departure": [flight_data.get("days_until_departure")],
+                "Origin_Lat": [flight_data.get("origin_lat")],
+                "Origin_Lon": [flight_data.get("origin_lon")],
+                "Destination_Lat": [flight_data.get("dest_lat")],
+                "Destination_Lon": [flight_data.get("dest_lon")],
             }
 
             df = pd.DataFrame(input_data)
@@ -172,9 +170,9 @@ class PricePredictorService:
 
             # addition only needed because we don't have Amadeus Prod Key yet
             if return_date:
-                diff = avg_predicted_price - current_price + 100
+                diff = avg_predicted_price - current_price
             else:
-                diff = avg_predicted_price - current_price + 30
+                diff = avg_predicted_price - current_price
 
             if diff > threshold:
                 return "rising"

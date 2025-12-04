@@ -16,7 +16,7 @@ A FastAPI application for querying European flight data with pricing analytics a
 
 ### Prerequisites
 
-- Python 3.11 or higher
+- Python 3.11 or higher; **Python 3.14 does not work**
 - pip
 
 ### Installation

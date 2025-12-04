@@ -16,4 +16,3 @@ geocode_cache.json
 .coverage
 htmlcov/
 cache
-data
